@@ -1,0 +1,16 @@
+folders id 
+  add grid to posts
+  add renderfodlers
+  
+  add case to if there are no posts
+  
+categories 
+  add grid to posts
+  add case to if there are no posts
+  change color of title 
+  
+nav 
+  remove changing deps 
+  
+username
+  add taginput to username

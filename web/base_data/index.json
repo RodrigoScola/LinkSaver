@@ -1,0 +1,195 @@
+{
+	"categories": [
+		{ "id": 0, "cat_name": "back-end", "cat_color": "#de37dc" },
+		{
+			"id": 1,
+			"cat_name": "Try to parse the RAM sensor, maybe it will generate the neural capacitor!",
+			"cat_color": "#f955b1"
+		},
+		{ "id": 2, "cat_name": "transmitting", "cat_color": "#aaa759" },
+		{ "id": 3, "cat_name": "COM", "cat_color": "#58da84" },
+		{ "id": 4, "cat_name": "SMTP", "cat_color": "#d5e3ef" },
+		{ "id": 5, "cat_name": "ADP", "cat_color": "#ebf9cc" },
+		{ "id": 6, "cat_name": "auxiliary", "cat_color": "#76b9ba" },
+		{ "id": 7, "cat_name": "transmitting", "cat_color": "#27f0e2" },
+		{
+			"id": 8,
+			"cat_name": "You can't compress the monitor without navigating the online SMTP hard drive!",
+			"cat_color": "#c8d1ab"
+		},
+		{ "id": 9, "cat_name": "virtual", "cat_color": "#33514e" },
+		{ "id": 10, "cat_name": "connecting", "cat_color": "#cdd8fb" },
+		{ "id": 11, "cat_name": "reboot", "cat_color": "#8cb538" },
+		{ "id": 12, "cat_name": "SDD", "cat_color": "#c19afb" },
+		{
+			"id": 13,
+			"cat_name": "Try to program the JSON alarm, maybe it will synthesize the back-end application!",
+			"cat_color": "#4c1fb6"
+		},
+		{ "id": 14, "cat_name": "back up", "cat_color": "#fbf694" }
+	],
+	"folders": [
+		{
+			"name": "Mathew Stanton",
+			"id": 0,
+			"color": "#e38928",
+			"items": [
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 0 }
+			]
+		},
+		{
+			"name": "District Paradigm Associate",
+			"id": 1,
+			"color": "#49192f",
+			"items": [
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 0 }
+			]
+		},
+		{
+			"name": "Producer",
+			"id": 2,
+			"color": "#fefb3f",
+			"items": [
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 2 }
+			]
+		},
+		{
+			"name": "Ryan",
+			"id": 3,
+			"color": "#5da0a6",
+			"items": [
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 1 }
+			]
+		},
+		{ "name": "Johnnie Raynor", "id": 4, "color": "#fa567f", "items": [{ "type": "categories", "item": 4 }] },
+		{
+			"name": "Bert Bode IV",
+			"id": 5,
+			"color": "#6a65ff",
+			"items": [
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 5 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 3 }
+			]
+		},
+		{ "name": "PhD", "id": 6, "color": "#f1d2d4", "items": [{ "type": "categories", "item": 6 }] },
+		{
+			"name": "male",
+			"id": 7,
+			"color": "#e619f1",
+			"items": [
+				{ "type": "categories", "item": 4 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 1 }
+			]
+		},
+		{
+			"name": "Guido",
+			"id": 8,
+			"color": "#0e22c3",
+			"items": [
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 8 },
+				{ "type": "categories", "item": 8 }
+			]
+		},
+		{
+			"name": "Tactics",
+			"id": 9,
+			"color": "#751e1c",
+			"items": [
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 5 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 2 }
+			]
+		},
+		{
+			"name": "Internal",
+			"id": 10,
+			"color": "#bc6e98",
+			"items": [
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 10 },
+				{ "type": "categories", "item": 2 }
+			]
+		},
+		{
+			"name": "Intersex woman",
+			"id": 11,
+			"color": "#b8cd06",
+			"items": [
+				{ "type": "categories", "item": 7 },
+				{ "type": "categories", "item": 1 },
+				{ "type": "categories", "item": 8 },
+				{ "type": "categories", "item": 3 },
+				{ "type": "categories", "item": 6 },
+				{ "type": "categories", "item": 7 }
+			]
+		},
+		{
+			"name": "DDS",
+			"id": 12,
+			"color": "#dfdbb4",
+			"items": [
+				{ "type": "categories", "item": 4 },
+				{ "type": "categories", "item": 0 },
+				{ "type": "categories", "item": 7 },
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 9 },
+				{ "type": "categories", "item": 5 },
+				{ "type": "categories", "item": 3 }
+			]
+		},
+		{
+			"name": "Global Applications Director",
+			"id": 13,
+			"color": "#fbfce6",
+			"items": [
+				{ "type": "categories", "item": 12 },
+				{ "type": "categories", "item": 4 },
+				{ "type": "categories", "item": 13 },
+				{ "type": "categories", "item": 8 },
+				{ "type": "categories", "item": 12 },
+				{ "type": "categories", "item": 8 },
+				{ "type": "categories", "item": 5 }
+			]
+		},
+		{
+			"name": "Corporate Data Officer",
+			"id": 14,
+			"color": "#c95bbf",
+			"items": [
+				{ "type": "categories", "item": 5 },
+				{ "type": "categories", "item": 2 },
+				{ "type": "categories", "item": 6 },
+				{ "type": "categories", "item": 14 },
+				{ "type": "categories", "item": 14 },
+				{ "type": "categories", "item": 3 }
+			]
+		}
+	]
+}
