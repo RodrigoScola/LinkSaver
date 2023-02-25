@@ -1,43 +1,44 @@
-const _ = require("lodash")
-const path = require("path")
-const fs = require("fs")
+const _ = require("lodash");
+const path = require("path");
+console.log("a");
+const fs = require("fs");
 const loopAsync = async (obj, callable) => {
 	if (!Array.isArray(obj)) {
-		const returned = await callable(obj)
+		const returned = await callable(obj);
 
 		if (typeof returned !== "undefined") {
-			obj = returned
+			obj = returned;
 		}
-		return obj
+		return obj;
 	}
-	const nobj = []
+	const nobj = [];
 	for (const i in obj) {
-		const currObj = obj[i]
-		const returned = callable(currObj)
+		const currObj = obj[i];
+		const returned = callable(currObj);
 
 		if (typeof returned !== "undefined") {
-			nobj.push(returned)
+			nobj.push(returned);
 		}
 	}
-	const res = Promise.all(nobj)
-	return res
-}
+	const res = Promise.all(nobj);
+	return res;
+};
 
 function deepSearch(object, key, predicate = null) {
 	if (object.hasOwnProperty(key)) {
 		if (predicate !== null) {
-			return predicate(key, object)
+			return predicate(key, object);
 		}
-		return object
+		return object;
 	}
 	for (let i = 0; i < Object.keys(object).length; i++) {
-		let value = object[Object.keys(object)[i]]
+		let value = object[Object.keys(object)[i]];
 		if (typeof value === "object" && value != null) {
-			let o = deepSearch(object[Object.keys(object)[i]], key, predicate)
-			if (o != null) return o
+			let o = deepSearch(object[Object.keys(object)[i]], key, predicate);
+			if (o != null) return o;
 		}
 	}
-	return null
+	return null;
 }
 
 const getRandom = (type) => {
@@ -45,17 +46,17 @@ const getRandom = (type) => {
 		fs.readFileSync(path.join(__dirname, "/class/basedata.json"), {
 			encoding: "utf-8",
 		})
-	)
+	);
 	switch (type) {
 		case "color":
-			const obj = file[type]
-			const randomNum = Math.floor(Math.random() * obj.length)
-			return obj[randomNum]
+			const obj = file[type];
+			const randomNum = Math.floor(Math.random() * obj.length);
+			return obj[randomNum];
 
 		default:
-			return file
+			return file;
 	}
-}
+};
 const postsColumns = {
 	id: 0,
 	createdAt: Date.now(),
@@ -72,14 +73,14 @@ const postsColumns = {
 		preview: {},
 	},
 	getColumns: () => {
-		return Object.keys(postsColumns).concat(Object.keys(postsColumns.extended))
+		return Object.keys(postsColumns).concat(Object.keys(postsColumns.extended));
 	},
-}
+};
 
 function getColumns(type) {
 	switch (type) {
 		case "posts":
-			return [""]
+			return [""];
 	}
 }
 
@@ -88,4 +89,4 @@ module.exports = {
 	getRandom,
 	postsColumns,
 	deepSearch,
-}
+};

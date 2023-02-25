@@ -3,7 +3,8 @@ import { loopAsync } from "../utils/formatting/utils"
 import formatter from "../utils/formatting/formatting"
 import { obj } from "../utils/formatting/ObjectFormat"
 
-const url = process.env.NODE_ENV == "development" ? "http://localhost:3001" : "https://linksaverweb.onrender.com"
+const url =
+	process.env.NODE_ENV == "development" ? "http://localhost:3001" : "https://linksaver-server-lrtx.onrender.com";
 
 const axios = axiosBase.create({
 	baseURL: url,
