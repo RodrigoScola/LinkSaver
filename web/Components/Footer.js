@@ -1,6 +1,6 @@
-import { EmailIcon } from "@chakra-ui/icons"
-import NextImage from "next/image"
-import LogoWhite from "../image/logo_white.png"
+import { EmailIcon } from "@chakra-ui/icons";
+import NextImage from "next/image";
+import LogoWhite from "../image/logo_white.png";
 import {
 	Text,
 	Box,
@@ -13,12 +13,12 @@ import {
 	SimpleGrid,
 	useMediaQuery,
 	Flex,
-} from "@chakra-ui/react"
-import NextLink from "next/link"
-import { SiGithub, SiLinkedin } from "react-icons/si"
+} from "@chakra-ui/react";
+import NextLink from "next/link";
+import { SiGithub, SiLinkedin } from "react-icons/si";
 export const Footer = () => {
-	const textColor = useColorModeValue("white", "black")
-	const [isSmall] = useMediaQuery("(max-width: 768px)")
+	const textColor = useColorModeValue("white", "black");
+	const [isSmall] = useMediaQuery("(max-width: 768px)");
 
 	return (
 		<>
@@ -86,13 +86,13 @@ export const Footer = () => {
 							More Information
 						</Heading>
 						<UnorderedList display={"flex"} flexDir={"column"} listStyleType={"none"}>
-							<ListItem as={NextLink} href={"#"}>
-								Source Code - Server
+							<ListItem as={NextLink} href={"https://github.com/RodrigoScola/LinkSaver"}>
+								Source Code
 							</ListItem>
-							<ListItem as={NextLink} href={"https://github.com/RodrigoScola/overflowOrganizer-web"}>
-								Source Code - Web
-							</ListItem>
-							<ListItem as={NextLink} href={"https://github.com/RodrigoScola/overflowOrganizer-server"}>
+							<ListItem
+								as={NextLink}
+								href={"https://github.com/RodrigoScola/overflowOrganizer-server"}
+							>
 								My Portfolio
 							</ListItem>
 						</UnorderedList>
@@ -100,5 +100,5 @@ export const Footer = () => {
 				</SimpleGrid>
 			</Box>
 		</>
-	)
-}
+	);
+};
