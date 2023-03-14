@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react"
+import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { BoxCardOutline } from "../Components/cards/BoxCardOutline"
 import { Box, Grid, Heading } from "@chakra-ui/react"
 import { usePosts } from "../hooks/usePosts"
