@@ -1,4 +1,4 @@
-import { SimpleGrid } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 import { BoxCardOutline } from "../Components/cards/BoxCardOutline"
 import { Box, Grid, Heading } from "@chakra-ui/react"
 import { usePosts } from "../hooks/usePosts"
@@ -108,7 +108,7 @@ export default function Home({ popularPosts: basePosts }) {
 								Recent Files
 							</Heading>
 						</BoxCard>
-						<SimpleGrid spacingY={"20px"} pt={10} minChildWidth={"100px"}>
+						<Flex wrap={"wrap"} spacingY={"20px"} pt={10} minChildWidth={""}>
 							{Object.values(posts)?.map((post, index) => {
 								return (
 									<PostProvider key={index} post={post}>
@@ -116,7 +116,7 @@ export default function Home({ popularPosts: basePosts }) {
 									</PostProvider>
 								)
 							})}
-						</SimpleGrid>
+						</Flex>
 					</Box>
 				)}
 				{folder.length > 0 && (
