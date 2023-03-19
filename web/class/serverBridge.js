@@ -65,12 +65,13 @@ class GetData {
 		return data
 	}
 	async getData(url, options = null) {
+		if (this.posts.has(url)) {
+			return this.posts.get(url)
+		}
 		const data = await (await this.ax.get(url, options)).data
 
 		if (data) {
 			this.posts.set(url, data)
-
-			console.log(this.posts)
 		}
 		return data
 	}

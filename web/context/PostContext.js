@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useUsers } from "../hooks/useUser"
+import { getCategory } from "../store/category/CategorySlice"
 import { addPost, selectPosts } from "../store/post/PostSlice"
 
 export const PostContext = createContext({ isCreator: false })
@@ -13,6 +14,14 @@ export const PostProvider = ({ post, children }) => {
 	const currentPost = useMemo(() => {
 		return all_posts.posts[post.id] || post
 	}, [all_posts.posts])
+
+	useEffect(() => {
+		if (post.categories) {
+			post.categories.forEach((item) => {
+				dispatch(getCategory(item))
+			})
+		}
+	}, [post.categories])
 
 	useEffect(() => {
 		if (post.id !== currentPost.id && post.id) {

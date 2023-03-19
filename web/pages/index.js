@@ -1,4 +1,4 @@
-import { Flex, SimpleGrid, useMediaQuery } from "@chakra-ui/react"
+import { Flex, SimpleGrid, useDisclosure, useMediaQuery } from "@chakra-ui/react"
 import { BoxCardOutline } from "../Components/cards/BoxCardOutline"
 import { Box, Grid, Heading } from "@chakra-ui/react"
 import { usePosts } from "../hooks/usePosts"
@@ -8,19 +8,19 @@ import { useUsers } from "../hooks/useUser"
 import { BoxCard } from "../Components/cards/BoxCard"
 import { useFetch } from "../hooks/useFetch"
 import { RenderHead } from "../Components/RenderHead"
-import { getData } from "../class/serverBridge"
+
 import { PostProvider } from "../context/PostContext"
 import { RenderPosts } from "../Components/RenderPosts"
-import { getUniques } from "../utils/formatting/ObjectFormat"
 
 import dynamic from "next/dynamic"
 import { supabase } from "../lib/supabaseClient"
 import { useCategories } from "../hooks/useCategories"
+import { useDispatch } from "react-redux"
+import { add_categories } from "../store/category/CategorySlice"
 const PostCard = dynamic(() => import("../Components/cards/PostCard").then((r) => r.PostCard))
 const RenderFolders = dynamic(() => import("../Components/postTypes/renderFolders").then((r) => r.RenderFolders))
 
 export default function Home({ popularPosts: basePosts, baseCategories = [] }) {
-	const _ = useCategories(baseCategories)
 	const [user] = useUsers()
 	const { data: folderData, setUrl: setFolderUrl } = useFetch("")
 	const isLoggedIn = user.id ? true : false
@@ -28,6 +28,10 @@ export default function Home({ popularPosts: basePosts, baseCategories = [] }) {
 	const { data, setUrl } = useFetch("")
 	const { posts, newPost } = usePosts([])
 	const { posts: popularPosts, newPost: newPopularPost } = usePosts([])
+	const dispatch = useDispatch()
+	useEffect(() => {
+		dispatch(add_categories(baseCategories))
+	}, [baseCategories])
 
 	useEffect(() => {
 		if (isLoggedIn) {
@@ -149,8 +153,12 @@ export const getStaticProps = async () => {
 	})
 
 	popularPosts = popularPosts.map((item) => ({ ...item, type: "posts" }))
+	const { data: baseCategories } = await supabase
+		.from("category")
+		.select("*")
+		.in("id", [...catIds])
 
 	return {
-		props: { popularPosts, baseCategories: [...catIds] },
+		props: { popularPosts, baseCategories },
 	}
 }

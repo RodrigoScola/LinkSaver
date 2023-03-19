@@ -14,7 +14,7 @@ export const useCategories = (categoriesIds = []) => {
 		(categories) => {
 			setCat((curr) => ({ ...curr, [categories.id]: { ...categories } }))
 		},
-		[setCat]
+		[setCat],
 	)
 	const setNewIds = useCallback(
 		(newValue, options = { strict: false }) => {
@@ -32,20 +32,20 @@ export const useCategories = (categoriesIds = []) => {
 				nids(newValue)
 			}
 		},
-		[ids, nids]
+		[ids, nids],
 	)
 	const go = async () => {
 		await loopAsync(ids, async (id) => {
 			let data = all_categories[id]
-			if (!data) {
-				data = await getData.getPost("categories", id)
-				dispatch(add_category({ category: data }))
-			}
+			// 	if (!data) {
+			// 		data = await getData.getPost("categories", id)
+			// 		dispatch(add_category({ category: data }))
+			// 	}
 			return setCategories(data)
 		})
 	}
 
-	const ury = (newInfo) => {
+	const updateCategory = (newInfo) => {
 		newInfo = {
 			...newInfo,
 		}
@@ -72,13 +72,13 @@ export const useCategories = (categoriesIds = []) => {
 			})
 			setNewIds(nids)
 		},
-		[setNewIds, setCategories, dispatch]
+		[setNewIds, setCategories, dispatch],
 	)
 	return {
 		categories: Object.values(categories),
 		setNewIds,
 		ids,
 		setCategories: setNewCats,
-		updateCategory: ury,
+		updateCategory: updateCategory,
 	}
 }
