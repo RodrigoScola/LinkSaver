@@ -59,7 +59,7 @@ class GetData {
 		}
 		const data = await (await this.ax.get(type + "/" + id)).data
 		if (data) {
-			this.add(type, id, data)
+			this.add(`${type}-${id}`, data)
 		}
 
 		return data
@@ -67,13 +67,18 @@ class GetData {
 	async getData(url, options = null) {
 		const data = await (await this.ax.get(url, options)).data
 
+		if (data) {
+			this.posts.set(url, data)
+
+			console.log(this.posts)
+		}
 		return data
 	}
-	add(type, key, value) {
-		this.posts.set(`${type}-${key}`, value)
+	add(key, value) {
+		this.posts.set(key, value)
 	}
-	get(key, id) {
-		return this.posts[key][id] ?? undefined
+	get(key) {
+		return this.posts.get(key)
 	}
 
 	async getPostData(type, post) {

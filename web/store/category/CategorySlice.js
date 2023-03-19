@@ -71,18 +71,15 @@ export const categorySlice = createSlice({
 
 export const selectCategoriesIds = (state) => state.category.ids
 export const selectCategories = (state) => state.category.categories
-export const selectCategoriesByIds = createSelector(
-	[(state) => selectCategories(state), (state, ids) => ids],
-	(state, ids) => {
-		if (!ids) return []
-		return ids.reduce((categories, id) => {
-			if (state[id]) {
-				categories.push(state[id])
-			}
-			return categories
-		}, [])
-	}
-)
+export const selectCategoriesByIds = createSelector([(state) => selectCategories(state), (state, ids) => ids], (state, ids) => {
+	if (!ids) return []
+	return ids.reduce((categories, id) => {
+		if (state[id]) {
+			categories.push(state[id])
+		}
+		return categories
+	}, [])
+})
 export const { add_category, add_categories, update_category } = categorySlice.actions
 
 export default categorySlice.reducer
