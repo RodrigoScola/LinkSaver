@@ -15,21 +15,19 @@ export const PostProvider = ({ post, children }) => {
 	}, [all_posts.posts])
 
 	useEffect(() => {
-		if (post.id !== currentPost.id) {
+		if (post.id !== currentPost.id && post.id) {
 			dispatch(addPost({ post }))
 		}
 	}, [post, dispatch, currentPost])
 
 	const updateCurrentPost = useCallback(
 		(newInformation) => {
-			if (newInformation) {
-				const post = { ...currentPost, ...newInformation, id: currentPost.id }
-				if (JSON.stringify(post) !== JSON.stringify(currentPost)) {
-					dispatch(addPost({ post }))
-				}
+			const curr = { ...currentPost, ...newInformation, id: currentPost.id }
+			if (curr.id) {
+				dispatch(addPost({ curr }))
 			}
 		},
-		[post, currentPost, dispatch]
+		[post, currentPost, dispatch],
 	)
 
 	return (

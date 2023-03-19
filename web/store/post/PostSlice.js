@@ -36,11 +36,9 @@ export const postSlice = createSlice({
 			})
 		},
 		addPost: (state, action) => {
-			const postId = action.payload.post.id
-			if (postId) {
-				const post = action.payload.post
-				state.posts[postId] = post
-			}
+			const postId = action.payload?.post?.id
+			const post = action.payload.post
+			state.posts[postId] = post
 		},
 
 		addLike: (state, action) => {

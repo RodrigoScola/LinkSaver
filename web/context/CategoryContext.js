@@ -17,14 +17,13 @@ export const CategoriesProvider = ({ children }) => {
 		return newCategory(all_categories[id])
 	}
 
-	const getCategories = (ids) => {
+	const getCategories = async (ids) => {
 		const n = new Set(ids)
-		const cats = Promise.all([...n].map((id) => getCategory(id)))
-		console.log(cats)
+		const cats = await Promise.all([...n].map((id) => getCategory(id)))
 		return cats
 	}
 
-	const addCategory = (id) => {
+	const addCategory = async (id) => {
 		let data = all_categories[id]
 		if (typeof id == "number") {
 			if (!data) {

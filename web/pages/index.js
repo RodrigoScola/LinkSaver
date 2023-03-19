@@ -1,22 +1,26 @@
-import { Flex, SimpleGrid } from "@chakra-ui/react"
+import { Flex, SimpleGrid, useMediaQuery } from "@chakra-ui/react"
 import { BoxCardOutline } from "../Components/cards/BoxCardOutline"
 import { Box, Grid, Heading } from "@chakra-ui/react"
 import { usePosts } from "../hooks/usePosts"
 import { useFolder } from "../hooks/useFolder"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useUsers } from "../hooks/useUser"
 import { BoxCard } from "../Components/cards/BoxCard"
 import { useFetch } from "../hooks/useFetch"
 import { RenderHead } from "../Components/RenderHead"
 import { getData } from "../class/serverBridge"
 import { PostProvider } from "../context/PostContext"
+import { RenderPosts } from "../Components/RenderPosts"
+import { getUniques } from "../utils/formatting/ObjectFormat"
 
 import dynamic from "next/dynamic"
 import { supabase } from "../lib/supabaseClient"
+import { useCategories } from "../hooks/useCategories"
 const PostCard = dynamic(() => import("../Components/cards/PostCard").then((r) => r.PostCard))
 const RenderFolders = dynamic(() => import("../Components/postTypes/renderFolders").then((r) => r.RenderFolders))
 
-export default function Home({ popularPosts: basePosts }) {
+export default function Home({ popularPosts: basePosts, baseCategories = [] }) {
+	const _ = useCategories(baseCategories)
 	const [user] = useUsers()
 	const { data: folderData, setUrl: setFolderUrl } = useFetch("")
 	const isLoggedIn = user.id ? true : false
@@ -24,8 +28,6 @@ export default function Home({ popularPosts: basePosts }) {
 	const { data, setUrl } = useFetch("")
 	const { posts, newPost } = usePosts([])
 	const { posts: popularPosts, newPost: newPopularPost } = usePosts([])
-
-	console.log(user.id)
 
 	useEffect(() => {
 		if (isLoggedIn) {
@@ -44,7 +46,7 @@ export default function Home({ popularPosts: basePosts }) {
 
 	useEffect(() => {
 		if (data) {
-			data.map((post) => newPost(post))
+			data.reverse().map((post) => newPost(post))
 		}
 	}, [data, newPost])
 	useEffect(() => {
@@ -52,8 +54,6 @@ export default function Home({ popularPosts: basePosts }) {
 			folderData.map((folder) => newFolder(folder))
 		}
 	}, [folderData, newFolder])
-
-	console.log(folderData)
 
 	return (
 		<Box>
@@ -78,7 +78,7 @@ export default function Home({ popularPosts: basePosts }) {
 							Popular Files
 						</Heading>
 					</BoxCard>
-					<SimpleGrid pt={10} spacingY={"20px"} spacingX={"20px"} minChildWidth={"100px"}>
+					<RenderPosts>
 						{popularPosts?.map((post, index) => {
 							return (
 								<PostProvider key={index} post={post}>
@@ -86,7 +86,7 @@ export default function Home({ popularPosts: basePosts }) {
 								</PostProvider>
 							)
 						})}
-					</SimpleGrid>
+					</RenderPosts>
 				</Box>
 				{posts.length > 0 && (
 					<Box p={4}>
@@ -108,7 +108,7 @@ export default function Home({ popularPosts: basePosts }) {
 								Recent Files
 							</Heading>
 						</BoxCard>
-						<Flex wrap={"wrap"} spacingY={"20px"} pt={10} minChildWidth={""}>
+						<RenderPosts>
 							{Object.values(posts)?.map((post, index) => {
 								return (
 									<PostProvider key={index} post={post}>
@@ -116,9 +116,10 @@ export default function Home({ popularPosts: basePosts }) {
 									</PostProvider>
 								)
 							})}
-						</Flex>
+						</RenderPosts>
 					</Box>
 				)}
+
 				{folder.length > 0 && (
 					<>
 						<Box my={10}>
@@ -139,8 +140,17 @@ export default function Home({ popularPosts: basePosts }) {
 }
 export const getStaticProps = async () => {
 	let { data: popularPosts } = await supabase.from("posts").select("*").eq("status", "public")
+	let catIds = new Set()
+
+	popularPosts.forEach((post) => {
+		post?.categories.forEach((catid) => {
+			catIds.add(catid)
+		})
+	})
+
 	popularPosts = popularPosts.map((item) => ({ ...item, type: "posts" }))
+
 	return {
-		props: { popularPosts },
+		props: { popularPosts, baseCategories: [...catIds] },
 	}
 }

@@ -30,7 +30,7 @@ export const PostCard = () => {
 				setCurrPost((curr) => ({ ...curr, [name]: value }))
 			}
 		},
-		[setCurrPost]
+		[setCurrPost],
 	)
 	const { data } = useFetch(`posts/${post.id}/?extended=true`)
 	useEffect(() => {
@@ -63,12 +63,7 @@ export const PostCard = () => {
 							borderColor={"white"}
 							// px={4}
 						>
-							<Img
-								width={"full"}
-								rounded={"2xl"}
-								src={post?.preview?.images[0] || "#"}
-								alt={`post image for the post ${post?.title}`}
-							/>
+							<Img width={"full"} rounded={"2xl"} src={post?.preview?.images[0] || "#"} alt={`post image for the post ${post?.title}`} />
 						</Container>
 					</Flex>
 				)}
