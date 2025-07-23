@@ -1,9 +1,10 @@
-const stackExchange = require("stackexchange")
-const _ = require("lodash")
+//@ts-ignore
+import stackExchange from "stackexchange"
+import  _ from "lodash"
 const options = {
 	version: 2.2,
 }
-const context = new stackExchange({
+export const context = new stackExchange({
 	options: options,
 })
 
@@ -49,8 +50,4 @@ class StackHandler {
 	}
 }
 
-const stackHandler = new StackHandler()
-module.exports = {
-	context,
-	stackHandler,
-}
+export const stackHandler = new StackHandler()

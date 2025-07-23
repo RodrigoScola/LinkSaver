@@ -1,10 +1,11 @@
-const { Table, supabase } = require("./Table")
+import { Table, supabase } from "./Table.js"
 
 class UsersTable extends Table {
 	tableName = "profiles"
 
+	/** @param {number} id */
 	async getExtended(id) {
-		const { data } = await supabase.from("profiles_info").select("*").eq("id", id).single()
+		const data= await supabase.from("profiles_info").select("*").where("id", id).first()
 
 		if (data) {
 			return data
@@ -35,6 +36,5 @@ class UsersTable extends Table {
 	}
 }
 
-const userstable = new UsersTable()
+export const userstable = new UsersTable()
 
-module.exports = { userstable }

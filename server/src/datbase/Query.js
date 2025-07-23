@@ -1,10 +1,15 @@
-class BaseQueryType {
+export class BaseQueryType {
 	type = ""
+	/**
+	 *
+	 * @type{ string | number}
+	 * @memberof BaseQueryType
+	 */
 	key = ""
 	value = ""
 }
 
-class EqualQueryType extends BaseQueryType {
+export class EqualQueryType extends BaseQueryType {
 	type = "eq"
 	constructor(key, value) {
 		super()
@@ -12,7 +17,7 @@ class EqualQueryType extends BaseQueryType {
 		this.value = value
 	}
 }
-class LikeQueryType extends BaseQueryType {
+export class LikeQueryType extends BaseQueryType {
 	type = "ilike"
 	constructor(key, value) {
 		super()
@@ -20,7 +25,7 @@ class LikeQueryType extends BaseQueryType {
 		this.value = value + "%"
 	}
 }
-class SearchQueryType extends BaseQueryType {
+export class SearchQueryType extends BaseQueryType {
 	type = "textSearch"
 	constructor(key, value) {
 		super()
@@ -28,7 +33,7 @@ class SearchQueryType extends BaseQueryType {
 		this.value = "'" + value + "'"
 	}
 }
-class RangeQueryType extends BaseQueryType {
+export class RangeQueryType extends BaseQueryType {
 	type = "range"
 	constructor(start = 0, end = 1) {
 		super()
@@ -36,17 +41,17 @@ class RangeQueryType extends BaseQueryType {
 		this.value = Math.max(start, end) - 1
 	}
 }
-class QueryType {
+export class QueryType {
 	constructor(type) {}
 }
-class SelectQueryType extends BaseQueryType {
+export class SelectQueryType extends BaseQueryType {
 	constructor(type, items = []) {
 		this.type = type
 		this.key = type
 		this.value = items
 	}
 }
-class OrderByQueryType extends BaseQueryType {
+export class OrderByQueryType extends BaseQueryType {
 	type = "order"
 	constructor(column, option = "") {
 		super()
@@ -55,7 +60,7 @@ class OrderByQueryType extends BaseQueryType {
 	}
 }
 
-class QueryOption {
+export class QueryOption {
 	constructor(option) {
 		this.option = option
 	}
@@ -76,7 +81,7 @@ class QueryOption {
 		}
 	}
 }
-class QueryOptions {
+export class QueryOptions {
 	#_options = []
 	constructor(baseQuery, baseOptions = []) {
 		this.#_options = []
@@ -110,11 +115,3 @@ class QueryOptions {
 	}
 }
 
-module.exports = {
-	QueryOptions,
-	RangeQueryType,
-	OrderByQueryType,
-	EqualQueryType,
-	SearchQueryType,
-	LikeQueryType,
-}

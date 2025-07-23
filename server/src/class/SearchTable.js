@@ -1,4 +1,4 @@
-class SearchColumn {
+export  class SearchColumn {
 	constructor(tableName) {
 		this.tableName = tableName
 	}
@@ -17,7 +17,7 @@ class SearchColumn {
 	}
 }
 
-class TableColumns {
+export class TableColumns {
 	constructor(tableName) {
 		this.columns = null
 		switch (tableName) {
@@ -26,7 +26,7 @@ class TableColumns {
 		}
 	}
 }
-class CategoryCollumns {
+export class CategoryCollumns {
 	constructor() {
 		this.id = ""
 		this.created_at = ""
@@ -37,6 +37,3 @@ class CategoryCollumns {
 	}
 }
 
-module.exports = {
-	SearchColumn,
-}

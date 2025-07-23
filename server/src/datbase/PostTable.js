@@ -1,20 +1,24 @@
-const { Table, supabase } = require("./Table")
-const { loopAsync } = require("../utils")
-const { getLinkPreview } = require("link-preview-js")
-const { Post } = require("../class/records/PostRecord")
+import { Table, supabase } from "./Table.js"
+import { loopAsync } from "../utils.js"
+import { getLinkPreview } from "link-preview-js"
+import { Post } from "../class/records/PostRecord.js"
+
+
 class PostExtended extends Table {
 	tableName = "posts_info"
+
 }
+
 
 const postExtended = new PostExtended()
 
-class PostsTable extends Table {
+export class PostsTable extends Table {
 	tableName = "posts"
 
 	async get_by(key, value) {
 		if (key == "categories") {
 			value = Array.isArray(value) ? value : [value]
-			let { data } = await supabase.from(this.tableName).select("*").contains("categories", value)
+			let { data } = await supabase.from(this.tableName).select("*").whereIn("categories", value)
 
 			data = await loopAsync(data, async (post) => {
 				post = new Post(post.id, post)
@@ -54,12 +58,6 @@ class PostsTable extends Table {
 	}
 }
 
-const postTable = new PostsTable()
-const n = new PostsTable()
+export const postTable = new PostsTable()
+export const n = new PostsTable()
 
-module.exports = {
-	postTable,
-	Post,
-	n,
-	PostsTable,
-}

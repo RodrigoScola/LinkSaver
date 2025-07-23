@@ -1,9 +1,9 @@
-const express = require("express")
-const { interactionsTable } = require("../datbase/InteractionsTable")
-const { postTable, Post } = require("../datbase/PostTable")
-const _ = require("lodash")
-const { RangeQueryType } = require("../datbase/Query")
-const { newPost } = require("../class/records/PostRecord")
+import express from 'express'
+import { interactionsTable } from "../datbase/InteractionsTable.js"
+import { postTable } from "../datbase/PostTable.js"
+import _ from 'lodash'
+import { RangeQueryType } from "../datbase/Query.js"
+import { Post} from "../class/records/PostRecord.js"
 const postRouter = express.Router()
 
 postRouter.param("id", async (req, res, next, id) => {
@@ -75,7 +75,7 @@ postRouter.delete("/:id", async (req, res) => {
 })
 postRouter.put("/:id", async (req, res) => {
 	const { id } = req.params
-	const post = newPost(req.body)
+	const post = Post.New(req.body)
 	const updated = await postTable.update(id, post)
 	console.log(updated)
 	res.send(updated)
@@ -85,4 +85,4 @@ postRouter.use((err, req, res, next) => {
 	res.send(err)
 })
 
-module.exports = postRouter
+export default postRouter

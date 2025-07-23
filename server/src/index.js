@@ -1,20 +1,26 @@
-require("dotenv").config()
-const express = require("express")
-const categoryRouter = require("./routes/category")
-const postsRouter = require("./routes/posts")
-const usersRouter = require("./routes/users")
-const cors = require("cors")
-const app = express()
-const { postInfoRouter } = require("./routes/postInfo")
-const bodyParser = require("body-parser")
-const foldersRouter = require("./routes/folders")
-const stackRouter = require("./routes/stack")
-const interactionsRouter = require("./routes/interactions")
-const queryRouter = require("./routes/queryRouter")
-const utilRouter = require("./routes/_")
-const searchRouter = require("./routes/search")
+import f from 'dotenv'
+
+f.config()
+
+import express  from "express"
+import categoryRouter  from "./routes/category.js"
+import postsRouter  from "./routes/posts.js"
+import usersRouter  from "./routes/users.js"
+import cors  from "cors"
+export const app = express()
+
+import  postInfoRouter  from "./routes/postInfo.js"
+import bodyParser from "body-parser"
+import foldersRouter from "./routes/folders.js"
+import stackRouter from "./routes/stack.js"
+import interactionsRouter from "./routes/interactions.js"
+import queryRouter from "./routes/queryRouter.js"
+import utilRouter from "./routes/_.js"
+import searchRouter from "./routes/search.js"
+import { supabase } from './datbase/Table.js'
 app.use(cors())
 app.use(bodyParser.json())
+
 
 app.use("/_", utilRouter)
 app.use("/categories", queryRouter)
@@ -36,4 +42,11 @@ categoryRouter.use("/:id/", postInfoRouter)
 
 app.listen(process.env.PORT, () => {
 	console.log("Server is listening in http://localhost:" + process.env.PORT)
+
+
+	supabase('posts').then(console.log)
+
+	supabase('posts').insert({
+
+	});
 })

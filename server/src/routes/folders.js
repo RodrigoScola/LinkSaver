@@ -1,6 +1,7 @@
-const express = require("express")
-const { foldersTable } = require("../datbase/FoldersTable")
-const { RangeQueryType, EqualQueryType } = require("../datbase/Query")
+import express from 'express'
+import { foldersTable } from "../datbase/FoldersTable.js"
+import { RangeQueryType, EqualQueryType } from "../datbase/Query.js"
+
 const foldersRouter = express.Router()
 
 foldersRouter.param("id", async (req, res, next, id) => {
@@ -81,4 +82,4 @@ foldersRouter.put("/:id", async (req, res) => {
 	const updated = await foldersTable.update(id, { ...req.body })
 	res.send(updated)
 })
-module.exports = foldersRouter
+export default foldersRouter

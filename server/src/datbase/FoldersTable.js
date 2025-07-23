@@ -1,4 +1,4 @@
-const { Table, supabase } = require("./Table")
+import { Table, supabase } from "./Table.js"
 
 class Folder {
 	constructor(options = { id }) {
@@ -121,7 +121,4 @@ class Folders extends Table {
 		return data
 	}
 }
-const foldersTable = new Folders()
-module.exports = {
-	foldersTable,
-}
+export const foldersTable = new Folders()

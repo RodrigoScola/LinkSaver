@@ -1,8 +1,13 @@
-const express = require("express")
-const { interactionsTable } = require("../datbase/InteractionsTable")
-const { postTable } = require("../datbase/PostTable")
+import express from "express"
+import { interactionsTable } from "../datbase/InteractionsTable.js"
+import { postTable } from "../datbase/PostTable.js"
+import { RangeQueryType } from "../datbase/Query.js"
+
+
+
+
 const interactionsRouter = express.Router()
-const { RangeQueryType } = require("../datbase/Query")
+
 interactionsRouter.use("/:postId/:userId", async (req, res, next) => {
 	const data = await interactionsTable.get_interaction("all", req.params.userId, req.params.postId)
 	if (data) {
@@ -45,4 +50,4 @@ interactionsRouter.use((err, req, res, next) => {
 	res.status(status).send(err.message)
 })
 
-module.exports = interactionsRouter
+export default interactionsRouter

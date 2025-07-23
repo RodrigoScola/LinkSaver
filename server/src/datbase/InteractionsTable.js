@@ -1,6 +1,6 @@
-const { Table, supabase } = require("./Table")
-const { userstable } = require("./UsersTable")
-class InteractionsTable extends Table {
+import { Table, supabase } from "./Table.js"
+import { userstable } from "./UsersTable.js"
+export class InteractionsTable extends Table {
 	tableName = "interactions"
 
 	async get_interaction(type, userId, postId = null) {
@@ -76,7 +76,4 @@ class InteractionsTable extends Table {
 		return true
 	}
 }
-const interactionsTable = new InteractionsTable()
-module.exports = {
-	interactionsTable,
-}
+export const interactionsTable = new InteractionsTable()

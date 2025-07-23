@@ -1,11 +1,9 @@
-const { getRandom } = require("../../utils")
+import { getRandom } from "../../utils.js"
 
-const newCategory = (params) => {
+/** @param {{name:string , color?:string}} params */
+export function newCategory  (params)  {
 	return {
 		cat_name: params.name,
 		cat_color: params?.color || getRandom("color"),
 	}
-}
-module.exports = {
-	newCategory,
 }

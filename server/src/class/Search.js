@@ -1,8 +1,8 @@
-const { LikeQueryType, RangeQueryType } = require("../datbase/Query")
-const { loopAsync } = require("../utils")
-const { getTable } = require("../class/utils")
-const { SearchColumn } = require("./SearchTable")
-const _ = require("lodash")
+import { LikeQueryType, RangeQueryType } from "../datbase/Query.js"
+import { loopAsync } from "../utils.js"
+import { getTable } from "../class/utils.js"
+import { SearchColumn } from "./SearchTable.js"
+import _ from "lodash"
 
 class Search {
 	defaultOptions = {
@@ -81,5 +81,4 @@ class Search {
 		return results
 	}
 }
-const searchTable = new Search()
-module.exports = searchTable
+export const searchTable = new Search()

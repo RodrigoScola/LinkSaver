@@ -1,5 +1,5 @@
-const { postTable } = require("./PostTable")
-const { Table } = require("./Table")
+import { postTable } from "./PostTable.js"
+import { Table } from "./Table.js"
 
 class CategoryTable extends Table {
 	tableName = "category"
@@ -10,8 +10,5 @@ class CategoryTable extends Table {
 	}
 }
 
-const categoryTable = new CategoryTable()
+export const categoryTable = new CategoryTable()
 
-module.exports = {
-	categoryTable,
-}

@@ -1,6 +1,8 @@
-const express = require("express")
-const { getTable } = require("../class/utils")
-const { deepSearch } = require("../utils")
+import express from 'express'
+import { getTable } from "../class/utils.js"
+import { deepSearch } from "../utils.js"
+
+
 const postInfoRouter = express.Router({
 	mergeParams: true,
 })
@@ -43,4 +45,4 @@ postInfoRouter.use((err, req, res, next) => {
 	res.status(status).send(err.message)
 })
 
-module.exports = { postInfoRouter }
+export default  postInfoRouter 

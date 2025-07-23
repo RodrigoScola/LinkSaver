@@ -1,5 +1,5 @@
-const express = require("express")
-const { getLinkPreview } = require("link-preview-js")
+import express from 'express'
+import { getLinkPreview } from "link-preview-js"
 
 const utilRouter = express.Router()
 
@@ -13,4 +13,4 @@ utilRouter.get("/getPreview", async (req, res) => {
 	}
 })
 
-module.exports = utilRouter
+export default utilRouter

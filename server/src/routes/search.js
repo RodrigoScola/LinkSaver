@@ -1,5 +1,5 @@
-const express = require("express")
-const searchTable = require("../class/Search")
+import express from 'express'
+import { searchTable }  from "../class/Search.js"
 
 const searchRouter = express.Router()
 
@@ -39,4 +39,4 @@ searchRouter.use((err, req, res, next) => {
 	res.status(status).send(err.message)
 })
 
-module.exports = searchRouter
+export default searchRouter

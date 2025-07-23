@@ -1,18 +1,38 @@
-const { QueryOptions } = require("./Query")
-const createClient = require("@supabase/supabase-js").createClient
-require("dotenv").config()
+import  knex  from 'knex'
+import { QueryOptions  } from "./Query.js"
 
-const url = process.env.SUPABASE_URL
-const key = process.env.SUPABASE_KEY
-const supabase = createClient(url, key)
-class Table {
+import config from '../../knexfile.js'
+import  d  from "dotenv" 
+
+d.config()
+
+
+/**
+ * @type {import('knex').Knex}
+ */
+export const supabase = knex(config.development)
+
+
+
+
+
+
+
+export class Table {
 	tableName = "defaulttable"
 	table = supabase
 
+	/**
+	 *
+	 *
+	 * @param {number | number[]} id
+	 * @param {*} [baseOptions=[]]
+	 * @memberof Table
+	 */
 	async get_by_id(id, baseOptions = []) {
 		try {
 			if (Array.isArray(id)) {
-				let { data } = await supabase.from(this.tableName).select("*").contains("id", id)
+				let { data } = await supabase.from(this.tableName).select("*").whereIn("id", id)
 				return data
 			}
 			const op = new QueryOptions(supabase.from(this.tableName).select("*").eq("id", id), baseOptions)
@@ -109,4 +129,3 @@ class Table {
 	}
 }
 
-module.exports = { Table, supabase }

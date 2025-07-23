@@ -1,7 +1,7 @@
-const express = require("express")
-const { userstable } = require("../datbase/UsersTable")
+import express from 'express'
+import { userstable } from "../datbase/UsersTable.js"
 
-const usersRouter = express.Router()
+ const usersRouter = express.Router()
 
 usersRouter.get("/:id", async (req, res) => {
 	const { id: categoryId } = req.params
@@ -28,4 +28,5 @@ usersRouter.put("/:id", async (req, res) => {
 	const updated = await userstable.update(id, { ...req.body })
 	res.send(updated)
 })
-module.exports = usersRouter
+
+export default usersRouter

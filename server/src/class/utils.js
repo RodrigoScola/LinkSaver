@@ -1,10 +1,10 @@
-const { categoryTable } = require("../datbase/CategoryTable")
-const { postTable } = require("../datbase/PostTable")
-const { foldersTable } = require("../datbase/FoldersTable")
-const { interactionsTable } = require("../datbase/InteractionsTable")
-const { userstable } = require("../datbase/UsersTable")
+import { categoryTable } from "../datbase/CategoryTable.js"
+import { postTable } from "../datbase/PostTable.js"
+import { foldersTable } from "../datbase/FoldersTable.js"
+import { interactionsTable } from "../datbase/InteractionsTable.js"
+import { userstable } from "../datbase/UsersTable.js"
 
-function getTable(type) {
+export function getTable(type) {
 	let table = postTable
 	switch (type) {
 		case "posts":
@@ -22,8 +22,4 @@ function getTable(type) {
 			return (table = interactionsTable)
 	}
 	return table
-}
-
-module.exports = {
-	getTable,
 }

@@ -1,7 +1,9 @@
-const express = require("express")
-const { SearchColumn } = require("../class/SearchTable")
-const { RangeQueryType, SearchQueryType, QueryOptions, EqualQueryType, OrderByQueryType } = require("../datbase/Query")
-const { getTable } = require("../class/utils")
+import express from 'express'
+import { SearchColumn } from "../class/SearchTable.js"
+import { RangeQueryType, SearchQueryType, QueryOptions, EqualQueryType, OrderByQueryType } from "../datbase/Query.js"
+import { getTable } from "../class/utils.js"
+
+
 const queryRouter = express.Router()
 
 queryRouter.use("/", async (req, res, next) => {
@@ -49,4 +51,4 @@ queryRouter.use("/", async (req, res, next) => {
 	next()
 })
 
-module.exports = queryRouter
+export default queryRouter

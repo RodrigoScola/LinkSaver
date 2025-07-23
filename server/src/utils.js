@@ -1,8 +1,7 @@
-const _ = require("lodash");
-const path = require("path");
-console.log("a");
-const fs = require("fs");
-const loopAsync = async (obj, callable) => {
+import path from 'path'
+import fs from 'fs'
+
+export const loopAsync = async (obj, callable) => {
 	if (!Array.isArray(obj)) {
 		const returned = await callable(obj);
 
@@ -20,11 +19,10 @@ const loopAsync = async (obj, callable) => {
 			nobj.push(returned);
 		}
 	}
-	const res = Promise.all(nobj);
-	return res;
+	return Promise.all(nobj);
 };
 
-function deepSearch(object, key, predicate = null) {
+export function deepSearch(object, key, predicate = null) {
 	if (object.hasOwnProperty(key)) {
 		if (predicate !== null) {
 			return predicate(key, object);
@@ -41,7 +39,7 @@ function deepSearch(object, key, predicate = null) {
 	return null;
 }
 
-const getRandom = (type) => {
+export const getRandom = (type) => {
 	const file = JSON.parse(
 		fs.readFileSync(path.join(__dirname, "/class/basedata.json"), {
 			encoding: "utf-8",
@@ -77,16 +75,10 @@ const postsColumns = {
 	},
 };
 
-function getColumns(type) {
+export function getColumns(type) {
 	switch (type) {
 		case "posts":
 			return [""];
 	}
 }
 
-module.exports = {
-	loopAsync,
-	getRandom,
-	postsColumns,
-	deepSearch,
-};

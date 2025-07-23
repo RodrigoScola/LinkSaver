@@ -1,8 +1,9 @@
-const express = require("express")
-const { stackHandler } = require("../class/StackExchange")
-const { categoryTable } = require("../datbase/CategoryTable")
-const { newCategory } = require("../class/records/categoryRecord")
-const { loopAsync, deepSearch } = require("../utils")
+import express from 'express'
+
+import { stackHandler } from "../class/StackExchange.js"
+import { categoryTable } from "../datbase/CategoryTable.js"
+import { newCategory } from "../class/records/categoryRecord.js"
+import { loopAsync, deepSearch } from "../utils.js"
 
 const stackRouter = express.Router()
 
@@ -48,12 +49,10 @@ stackParams.get("/:type", async (req, res) => {
 	}
 	return res.send(req.post[req.params.type])
 
-	const data = await stackHandler.getFromId(req.params.id, "stackoverflow")
-	res.send([".net", "printing", "javascript", "php", "astrology", "gunbreaker"])
 })
 
 stackRouter.use((err, req, res, next) => {
 	const status = err.status || 500
 	res.status(status).send(err.message)
 })
-module.exports = stackRouter
+export default stackRouter

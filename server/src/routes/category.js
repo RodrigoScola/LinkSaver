@@ -1,6 +1,5 @@
-const express = require("express")
-
-const { categoryTable } = require("../datbase/CategoryTable")
+import express from "express"
+import { categoryTable } from "../datbase/CategoryTable.js"
 
 const categoryRouter = express.Router()
 
@@ -50,4 +49,4 @@ categoryRouter.put("/:id", async (req, res) => {
 	const updated = await categoryTable.update(id, { ...req.body })
 	res.send(updated)
 })
-module.exports = categoryRouter
+export default categoryRouter
