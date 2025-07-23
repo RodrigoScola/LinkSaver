@@ -1,30 +1,48 @@
-// types/knex.d.ts
-
-// Must be first so the module augmentation works correctly
-import type { Knex } from 'knex';
+import { Knex, knex } from 'knex';
 
 declare module 'knex/types/tables' {
-	interface Tables {}
+	interface Tables {
+		posts: Post;
+		categories: Category;
+	}
 }
 
 // Global types
 declare global {
+	export type BaseQuery = knex.Knex<any, any[]>;
+
+	/**
+	 * Get all method keys of BaseQuery (functions only)
+	 */
+	export type FunctionKeys<T> = {
+		[K in keyof T]: T[K] extends (...args: any) => any ? K : never;
+	}[keyof T];
+
+	export type QueryMethod = FunctionKeys<BaseQuery>;
+
+	/**
+	 * Base class for query types
+	 */
 	export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 	export type OmitBy<T, K extends keyof T> = Omit<T, K>;
-
-	export enum POST_TYPE {
-		Post = 1,
-		Directory = 2,
-	}
 
 	export type Post = {
 		title: string;
 		id: number;
 		post_url: string;
-		description: 'string';
-		userId: string;
+		description: string;
+		userId: number;
 		parent?: number;
-		type: POST_TYPE;
+		post_type: POST_TYPE;
+		created_at: string;
+		updated_at: string;
+	};
+
+	export type Category = {
+		id: number;
+		name: params.name;
+		color: string;
+		status: string;
 	};
 
 	export type PostCategories = {

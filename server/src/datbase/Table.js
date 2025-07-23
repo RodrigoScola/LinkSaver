@@ -1,26 +1,19 @@
-import  knex  from 'knex'
-import { QueryOptions  } from "./Query.js"
+import knex from 'knex';
+import { QueryOptions } from './Query.js';
 
-import config from '../../knexfile.js'
-import  d  from "dotenv" 
+import config from '../../knexfile.cjs';
+import d from 'dotenv';
 
-d.config()
-
+d.config();
 
 /**
  * @type {import('knex').Knex}
  */
-export const supabase = knex(config.development)
-
-
-
-
-
-
+export const supabase = knex(config.development);
 
 export class Table {
-	tableName = "defaulttable"
-	table = supabase
+	tableName = 'defaulttable';
+	table = supabase;
 
 	/**
 	 *
@@ -32,100 +25,107 @@ export class Table {
 	async get_by_id(id, baseOptions = []) {
 		try {
 			if (Array.isArray(id)) {
-				let { data } = await supabase.from(this.tableName).select("*").whereIn("id", id)
-				return data
+				let data = await supabase.from(this.tableName).select('*').whereIn('id', id);
+				return data;
 			}
-			const op = new QueryOptions(supabase.from(this.tableName).select("*").eq("id", id), baseOptions)
-			const { data: post, error } = await op.options.single()
+			const op = new QueryOptions(
+				supabase.from(this.tableName).select('*').where('id', id),
+				baseOptions
+			);
+			const { data: post, error } = await op.options.first();
 			if (post) {
 				return {
 					type: this.tableName,
 					...post,
-				}
+				};
 			}
-			return null
+			return null;
 		} catch (err) {
-			return {}
+			return {};
 		}
 	}
+	/** @param {string} type */
 	async get_all(type) {
-		const { data } = await supabase.from(this.tableName).select(type)
+		const data = await supabase.from(this.tableName).select(type);
 		if (!data) {
-			return []
+			return [];
 		}
 		return data.reduce((curr, item) => {
-			curr = [...curr, item[type]]
-			return curr
-		}, [])
+			curr = [...curr, item[type]];
+			return curr;
+		}, []);
 	}
 	async get_posts(optionsParam = []) {
-		let query = supabase.from(this.tableName).select("*").eq("status", "public")
+		let query = supabase.from(this.tableName).select('*').where('status', 'public');
 
-		let options = new QueryOptions(query, optionsParam)
+		let options = new QueryOptions(query, optionsParam);
 
-		const { data, error } = await options.options.order("id", { ascending: false })
+		const { data, error } = await options.options.order('id', { ascending: false });
 		if (error) {
-			return []
+			return [];
 		}
 
 		return data.map((item) => {
 			return {
 				type: this.tableName,
 				...item,
-			}
-		})
+			};
+		});
 	}
 	async getExtended(postId) {
-		const { data, error } = await supabase.from("posts_info").select("*").eq("id", postId).maybeSingle()
-		return data
+		const { data, error } = await supabase.from('posts_info').select('*').eq('id', postId).maybeSingle();
+		return data;
 	}
 	async add(params, options = []) {
-		const { data, error, status } = await supabase.from(this.tableName).insert(params).select().maybeSingle()
+		const { data, error, status } = await supabase
+			.from(this.tableName)
+			.insert(params)
+			.select()
+			.maybeSingle();
 		if (error) {
-			console.log(error, status)
+			console.log(error, status);
 		}
-		return data
+		return data;
 	}
 	async addOrRetrieve(obj = [{ key: value }], params) {
-		const items = Object.entries(obj)
-		let query = supabase.from(this.tableName).select("*")
+		const items = Object.entries(obj);
+		let query = supabase.from(this.tableName).select('*');
 
 		items.forEach((item) => {
-			query = query.eq(item[0], item[1])
-		})
-		let { data } = await query.maybeSingle()
+			query = query.eq(item[0], item[1]);
+		});
+		let { data } = await query.maybeSingle();
 		if (data == null) {
-			data = await this.add(params)
+			data = await this.add(params);
 		}
-		return data
+		return data;
 	}
 	async update(postId, newInformation) {
 		const { data, error, status } = await supabase
 			.from(this.tableName)
 			.update(newInformation)
-			.eq("id", postId)
+			.eq('id', postId)
 			.select()
-			.single()
+			.single();
 
-		return data
+		return data;
 	}
 	async delete(postId) {
 		try {
-			const update = await this.update(postId, { status: "private" })
-			return true
+			const update = await this.update(postId, { status: 'private' });
+			return true;
 		} catch (err) {
-			return false
+			return false;
 		}
 	}
 	async getPostsById(postId) {
-		const { data } = await supabase.rpc("get_posts_of_" + this.tableName, { id: postId })
-		console.log(this.tableName)
+		const { data } = await supabase.rpc('get_posts_of_' + this.tableName, { id: postId });
+		console.log(this.tableName);
 
-		return data
+		return data;
 	}
 	async get_by(key, value) {
-		const { data, error } = await supabase.from(this.tableName).select("*").eq(key, value).select()
-		return data
+		const { data, error } = await supabase.from(this.tableName).select('*').eq(key, value).select();
+		return data;
 	}
 }
-

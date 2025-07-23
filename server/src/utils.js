@@ -75,6 +75,7 @@ const postsColumns = {
 	},
 };
 
+/** @param {string} type */
 export function getColumns(type) {
 	switch (type) {
 		case "posts":

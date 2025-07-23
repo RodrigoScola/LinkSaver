@@ -8,9 +8,9 @@ exports.up = function(knex) {
         table.increments('id').primary();
         table.string('title').notNullable()
         table.string('description');
-        table.string('post_url').notNullable()
+        table.string('post_url');
         table.integer('userId').notNullable()
-        table.integer('parent').notNullable()
+        table.integer('parent').notNullable().defaultTo(-1)
         table.timestamps(true, true);
         table.integer('post_type').notNullable()
     })

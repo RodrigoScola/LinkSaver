@@ -3,7 +3,7 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-export default {
+module.exports = {
 
   development: {
     client: 'sqlite3',

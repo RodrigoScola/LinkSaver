@@ -14,7 +14,7 @@ import bodyParser from "body-parser"
 import foldersRouter from "./routes/folders.js"
 import stackRouter from "./routes/stack.js"
 import interactionsRouter from "./routes/interactions.js"
-import queryRouter from "./routes/queryRouter.js"
+// import queryRouter from "./routes/queryRouter.js"
 import utilRouter from "./routes/_.js"
 import searchRouter from "./routes/search.js"
 import { supabase } from './datbase/Table.js'
@@ -23,13 +23,13 @@ app.use(bodyParser.json())
 
 
 app.use("/_", utilRouter)
-app.use("/categories", queryRouter)
-app.use("/folders", queryRouter)
-app.use("/search", queryRouter)
+// app.use("/categories", queryRouter)
+// app.use("/folders", queryRouter)
+// app.use("/search", queryRouter)
 app.use("/folders", foldersRouter)
-app.use("/posts", queryRouter)
-app.use("/interactions", queryRouter)
-app.use("/users", queryRouter)
+// app.use("/posts", queryRouter)
+// app.use("/interactions", queryRouter)
+// app.use("/users", queryRouter)
 app.use("/categories", categoryRouter)
 app.use("/posts", postsRouter)
 app.use("/search", searchRouter)
@@ -40,13 +40,15 @@ postsRouter.use("/:id/", postInfoRouter)
 foldersRouter.use("/:id/", postInfoRouter)
 categoryRouter.use("/:id/", postInfoRouter)
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, async () => {
 	console.log("Server is listening in http://localhost:" + process.env.PORT)
 
 
-	supabase('posts').then(console.log)
 
-	supabase('posts').insert({
+	// await supabase('categories').insert({ color: '#000000',
+	// 	name: 'hello there',
+	// 	status: 'public'
+	// });
 
-	});
+	supabase('categories').then(console.log)
 })
