@@ -1,14 +1,23 @@
+import { AsyncQueue } from '../class/async';
 import { Knex, knex } from 'knex';
 
 declare module 'knex/types/tables' {
 	interface Tables {
 		posts: Post;
 		categories: Category;
+		posts_categories: PostCategories;
+		folders: Folder;
 	}
 }
 
 // Global types
 declare global {
+	namespace Express {
+		export interface Request {
+			queue: AsyncQueue;
+		}
+	}
+
 	export type BaseQuery = knex.Knex<any, any[]>;
 
 	/**
@@ -19,6 +28,18 @@ declare global {
 	}[keyof T];
 
 	export type QueryMethod = FunctionKeys<BaseQuery>;
+
+	export type Folder = {
+		title: string;
+		id: number;
+		color: string;
+		description: string;
+		userId: number;
+		parent_folder: number;
+		status: 'public' | 'private';
+		created_at: string;
+		updated_at: string;
+	};
 
 	/**
 	 * Base class for query types
@@ -33,7 +54,7 @@ declare global {
 		description: string;
 		userId: number;
 		parent?: number;
-		post_type: POST_TYPE;
+		status: 'public' | 'private';
 		created_at: string;
 		updated_at: string;
 	};
@@ -47,8 +68,8 @@ declare global {
 
 	export type PostCategories = {
 		id: number;
-		category: number;
-		postId: number;
+		category_id: number;
+		post_id: number;
 	};
 	export type NewPost = OmitBy<Post, 'id'>;
 }

@@ -73,6 +73,5 @@ export const ContextParametersObj: ContextParameters<{ id: number }> = {
 export type AvailableContextItems = keyof (typeof ContextFactory)['items'];
 
 export type ContextInfoProps<T extends object> = {
-	ignoreWithStatus?: ItemStatus[] | ItemStatus | null | undefined;
 	parameters?: ContextParameters<T> | undefined;
 };

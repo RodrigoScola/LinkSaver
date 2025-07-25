@@ -1,7 +1,13 @@
-import express from 'express'
-import { SearchColumn } from "../class/SearchTable.js"
-import { RangeQueryType, SearchQueryType, QueryOptions, EqualQueryType, OrderByQueryType } from "../datbase/Query.js"
-import { getTable } from "../class/utils.js"
+import express from 'express';
+import { SearchColumn } from '../class/SearchTable.js';
+import {
+	RangeQueryType,
+	SearchQueryType,
+	QueryOptions,
+	EqualQueryType,
+	OrderByQueryType,
+} from '../datbase/Query.js';
+import { getTable } from '../class/utils';
 
 //todo: make this happen
 

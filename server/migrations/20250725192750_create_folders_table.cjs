@@ -3,14 +3,14 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-	return knex.schema.createTable('posts', (table) => {
+	return knex.schema.createTable('folders', (table) => {
 		table.increments('id').primary();
 		table.string('title').notNullable();
 		table.string('description');
-		table.string('post_url');
+		table.string('color');
 
 		table.integer('userId').notNullable();
-		table.integer('parent').notNullable().defaultTo(-1);
+		table.integer('parent_folder').notNullable().defaultTo(-1);
 		table.timestamps(true, true);
 		table.string('status').notNullable().defaultTo('public');
 	});
@@ -21,5 +21,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-	return knex.schema.dropTableIfExists('posts');
+	return knex.schema.dropTableIfExists('folders');
 };

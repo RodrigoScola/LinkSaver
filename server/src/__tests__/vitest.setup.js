@@ -1,8 +1,9 @@
-import { app } from 'src';
-import {  supabase } from 'src/datbase/Table';
+import { app } from '../index';
 import supertest from 'supertest';
 
+import config from '../../knexfile.cjs';
+import { knex } from 'knex';
 
-export const dbconnection = supabase;
+export const dbconnection = knex(config.development);
 
 export const App = supertest(app);

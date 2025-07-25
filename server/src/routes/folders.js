@@ -1,85 +1,87 @@
-import express from 'express'
-import { foldersTable } from "../datbase/FoldersTable.js"
-import { RangeQueryType, EqualQueryType } from "../datbase/Query.js"
+import express from 'express';
+import { getTable } from '../../src/class/utils';
+import { ContextBuilder } from '../../src/queryFilter/ContextBuilder';
+import { ContextFactory } from '../../src/queryFilter/DatabaseContext';
+import { InternalError, NotFoundError } from 'src/ErrorHandling/ErrorHandler';
+// import { foldersTable } from '../datbase/FoldersTable.js';
+// import { RangeQueryType, EqualQueryType } from '../datbase/Query.js';
 
-const foldersRouter = express.Router()
+const foldersRouter = express.Router();
 
-foldersRouter.param("id", async (req, res, next, id) => {
-	const folderId = id
+foldersRouter.param('id', async (req, res, next, id) => {
+	req.queue.Add(
+		'folder',
+		ContextFactory.fromRequest('folders', getTable('folders'))
+			.SetParameters(ContextBuilder.FromParameters(req.query))
+			.Build()
+			.where('id', id)
+			.first()
+	);
+
+	next();
+});
+
+foldersRouter.get('/:id', async (req, res) => {
+	// let post = req.post;
+	// res.send(post);
+});
+foldersRouter.get('/', async (req, res) => {
+	req.queue.Add(
+		'folder',
+		ContextFactory.fromRequest('folders', getTable('folders'))
+			.SetParameters(ContextBuilder.FromParameters(req.query))
+			.Build()
+	);
+
+	await req.queue.Build();
+
+	const folders = req.queue.Get('folder');
+
+	if (folders.status === 'rejected' || !folders.value) {
+		throw new NotFoundError('could not complete the operation');
+	}
+
+	res.json(folders.value);
+});
+foldersRouter.post('/', async (req, res) => {
 	try {
-		const folder = await foldersTable.get_by_id(id)
-		if (folder) {
-			req.post = folder
-		} else {
-			throw new Error("folder not found")
+		req.queue.Add('new_folder', getTable('folders').insert(req.body));
+
+		await req.queue.Build();
+
+		const folderId = req.queue.GetResult('new_folder');
+
+		if (!folderId || !Array.isArray(folderId)) {
+			throw new InternalError();
 		}
 
-		next()
+		const folder = await getTable('folders').where('id', folderId[0]);
+
+		res.json(folder);
 	} catch (err) {
-		next(err)
+		throw new InternalError();
 	}
-})
+});
 
-foldersRouter.get("/:id", async (req, res) => {
-	let post = req.post
+foldersRouter.put('/:id', async (req, res) => {
+	await req.queue
+		.Add('updated_folder', getTable('folders').update(req.body).where('id', req.params.id))
+		.Build();
 
-	res.send(post)
-})
-foldersRouter.get("/", async (req, res) => {
-	const recentPosts = await foldersTable.get_posts([...req.queryOptions])
-	res.send(recentPosts)
-})
-foldersRouter.post("/", async (req, res) => {
-	// try {
-	console.log(req.body)
-	const { name, color, items, parent_folder, user_id } = req.body
-	let data
+	const hasFolder = Boolean(req.queue.GetResult('folder'));
 
-	const exists = await foldersTable.get_posts([
-		new EqualQueryType("name", name),
-		new EqualQueryType("user_id", user_id),
-		new RangeQueryType(0, 10),
-	])
-
-	if (!exists[0]) {
-		data = await foldersTable.add({
-			name,
-			user_id,
-			color,
-			parent_folder,
-		})
-	} else {
-		data = foldersTable.update(exists.id, {
-			...exists,
-			name,
-			parent_folder,
-			color,
-			items: {
-				...exists.items,
-				...items,
-			},
-		})
+	if (!hasFolder) {
+		throw new NotFoundError('could not complete the operation');
 	}
 
-	// 	res.send(data)
-	// } catch (err) {
-	// 	console.log(err)
-	// }
-})
-foldersRouter.post("/:id", async (req, res) => {
-	const id = req.post.id
-	const post_id = req.body.post_id
-	const type = req.body.type
-	res.send("aoisdfj")
-	try {
-		const data = await foldersTable.addItem(id, { id: post_id, type: type })
-		res.send(data)
-	} catch (err) {}
-})
-foldersRouter.put("/:id", async (req, res) => {
-	const { id } = req.params
+	const updatedFolderId = req.queue.Get('updated_folder');
 
-	const updated = await foldersTable.update(id, { ...req.body })
-	res.send(updated)
-})
-export default foldersRouter
+	if (updatedFolderId.status === 'rejected' || !updatedFolderId.value) {
+		throw new NotFoundError('could not complete the operation');
+	}
+
+	const folder = await getTable('folders').where('id', req.params.id).first();
+
+	res.send(folder);
+});
+export default foldersRouter;
