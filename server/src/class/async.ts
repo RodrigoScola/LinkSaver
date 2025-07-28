@@ -36,6 +36,10 @@ export class AsyncQueue {
 
 	//not recommended but sometimes can be nice
 	public GetResult(key: string): unknown {
+		if (!(key in this.results)) {
+			return;
+		}
+
 		return this.results[key].status === 'fulfilled' ? this.results[key].value : this.results[key].reason;
 	}
 

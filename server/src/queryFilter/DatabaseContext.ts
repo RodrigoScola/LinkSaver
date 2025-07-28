@@ -55,15 +55,36 @@ export class ContextFactory {
 ContextFactory.AddItem(
 	'categories',
 	(q: DatabaseQuery<'categories'>): ContextInstance<'categories'> =>
-		new ItemContextMaker<Category, 'categories'>(q)
+		new ItemContextMaker<Category, 'categories'>(
+			q
+
+				//we dont have anything that makes us available to see private in frontend yet
+				.where('status', 'public')
+		)
 );
 
 ContextFactory.AddItem(
 	'posts',
-	(q: DatabaseQuery<'posts'>): ContextInstance<'posts'> => new ItemContextMaker<Category, 'posts'>(q)
+	(q: DatabaseQuery<'posts'>): ContextInstance<'posts'> => new ItemContextMaker<Post, 'posts'>(q)
 );
 
 ContextFactory.AddItem(
 	'folders',
-	(q: DatabaseQuery<'folders'>): ContextInstance<'folders'> => new ItemContextMaker<Category, 'folders'>(q)
+	(q: DatabaseQuery<'folders'>): ContextInstance<'folders'> => new ItemContextMaker<Folder, 'folders'>(q)
+);
+
+ContextFactory.AddItem(
+	'users',
+	(q: DatabaseQuery<'users'>): ContextInstance<'users'> => new ItemContextMaker<User, 'users'>(q)
+);
+ContextFactory.AddItem(
+	'post_categories',
+	(q: DatabaseQuery<'post_categories'>): ContextInstance<'post_categories'> =>
+		new ItemContextMaker<PostCategories, 'post_categories'>(q)
+);
+
+ContextFactory.AddItem(
+	'interactions',
+	(q: DatabaseQuery<'interactions'>): ContextInstance<'interactions'> =>
+		new ItemContextMaker<Interaction, 'interactions'>(q)
 );

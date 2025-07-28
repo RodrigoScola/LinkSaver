@@ -3,6 +3,7 @@ import { getTable } from '../../src/class/utils';
 import { ContextBuilder } from '../../src/queryFilter/ContextBuilder';
 import { ContextFactory } from '../../src/queryFilter/DatabaseContext';
 import { InternalError, NotFoundError } from 'src/ErrorHandling/ErrorHandler';
+import { privatizeItem } from 'src/Storage';
 // import { foldersTable } from '../datbase/FoldersTable.js';
 // import { RangeQueryType, EqualQueryType } from '../datbase/Query.js';
 
@@ -65,6 +66,7 @@ foldersRouter.post('/', async (req, res) => {
 
 foldersRouter.put('/:id', async (req, res) => {
 	await req.queue
+
 		.Add('updated_folder', getTable('folders').update(req.body).where('id', req.params.id))
 		.Build();
 
@@ -83,5 +85,23 @@ foldersRouter.put('/:id', async (req, res) => {
 	const folder = await getTable('folders').where('id', req.params.id).first();
 
 	res.send(folder);
+});
+
+foldersRouter.delete('/:id', async (req, res) => {
+	await req.queue.Build();
+
+	const original = req.queue.Get('folder');
+
+	if (original.status !== 'fulfilled' || !original.value) {
+		throw new NotFoundError(`category not found`);
+	}
+
+	try {
+		await privatizeItem(getTable('folders').where('id', req.params.id));
+	} catch (err) {
+		res.json(false);
+	}
+
+	res.json(true);
 });
 export default foldersRouter;

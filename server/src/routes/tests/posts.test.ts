@@ -93,6 +93,6 @@ describe('teste de rotas de posts', () => {
 
 		const dbcat = await dbconnection('posts').where('id', cat!.id).first();
 
-		expect(dbcat!.title).not.eq('public');
+		expect(dbcat!.status).not.eq('public');
 	});
 });

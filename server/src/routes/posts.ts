@@ -7,7 +7,8 @@ import { ContextBuilder } from '../../src/queryFilter/ContextBuilder.js';
 import { privatizeItem } from '../../src/Storage';
 const postRouter = express.Router();
 
-postRouter.param('id', async (req, res, next, id) => {
+postRouter.param('postId', async (req, res, next, id) => {
+	console.log(req);
 	req.queue.Add(
 		'post',
 		ContextFactory.fromRequest('posts', getTable('posts'))
@@ -20,7 +21,7 @@ postRouter.param('id', async (req, res, next, id) => {
 	next();
 });
 
-postRouter.get('/:id', async (req, res) => {
+postRouter.get('/:postId', async (req, res) => {
 	await req.queue.Build();
 
 	const post = req.queue.Get('post');
@@ -70,7 +71,7 @@ postRouter.post('/', async (req, res) => {
 	res.json(post);
 });
 
-postRouter.delete('/:id', async (req, res) => {
+postRouter.delete('/:postId', async (req, res) => {
 	await req.queue.Build();
 
 	const post = req.queue.Get('post');
@@ -79,7 +80,7 @@ postRouter.delete('/:id', async (req, res) => {
 	}
 
 	try {
-		await privatizeItem(getTable('posts').where('id', req.params.id));
+		await privatizeItem(getTable('posts').where('id', req.params.postId));
 	} catch (err) {
 		res.json(false);
 	}
@@ -87,7 +88,7 @@ postRouter.delete('/:id', async (req, res) => {
 	res.json(true);
 });
 
-postRouter.put('/:id', async (req, res) => {
+postRouter.put('/:postId', async (req, res) => {
 	await req.queue.Build();
 
 	const post = req.queue.Get('post');
@@ -95,9 +96,9 @@ postRouter.put('/:id', async (req, res) => {
 		throw new NotFoundError(`could not get post with that id`);
 	}
 
-	await getTable('posts').update(req.body).where('id', req.params.id);
+	await getTable('posts').update(req.body).where('id', req.params.postId);
 
-	const updatedPost = await getTable('posts').where('id', req.params.id).first();
+	const updatedPost = await getTable('posts').where('id', req.params.postId).first();
 
 	res.send(updatedPost);
 });

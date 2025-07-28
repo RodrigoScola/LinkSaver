@@ -94,4 +94,12 @@ describe('teste de rotas de folders', () => {
 
 		expect(dbcat!.title).not.eq('public');
 	});
+	it('deletes a foledr but not from the database', async () => {
+		const cat = await dbconnection('folders').orderBy('id', 'desc').first();
+		expect(cat).toBeDefined();
+		const response = await App.delete(`/folders/${cat!.id}`);
+		expect(response.status).eq(200);
+		const dbcat = await dbconnection('folders').where('id', cat!.id).first();
+		expect(dbcat!.status).not.eq('public');
+	});
 });

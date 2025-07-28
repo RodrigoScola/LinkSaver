@@ -9,7 +9,7 @@ exports.up = function (knex) {
 		table.string('description');
 		table.string('post_url');
 
-		table.integer('userId').notNullable();
+		table.string('userId').notNullable();
 		table.integer('parent').notNullable().defaultTo(-1);
 		table.timestamps(true, true);
 		table.string('status').notNullable().defaultTo('public');

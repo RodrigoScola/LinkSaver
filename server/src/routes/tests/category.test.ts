@@ -40,6 +40,8 @@ describe('teste de rotas de categorias', () => {
 					color: '#848937',
 					name: 'other than that',
 					status: 'public',
+
+					userId: -1,
 				},
 				'*'
 			)
