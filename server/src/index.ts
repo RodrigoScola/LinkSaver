@@ -23,6 +23,7 @@ import { dbconnection } from './__tests__/vitest.setup';
 import { getTable } from './class/utils';
 import { postCategoryRouter } from './routes/post_category';
 import postRouter from './routes/posts.js';
+import { Category, Post, PostCategories } from 'shared';
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -65,6 +66,7 @@ app.use(EFunction);
 if (process.env.NODE_ENV !== 'test') {
 	app.listen(process.env.PORT, async () => {
 		// await generateDummyCategories();
+
 		console.log('Server is listening in http://localhost:' + process.env.PORT);
 	});
 }
@@ -95,6 +97,4 @@ async function generateDummyCategories() {
 	}
 
 	await q.Build();
-
-	console.log(q.results);
 }

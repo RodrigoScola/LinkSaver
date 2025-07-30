@@ -13,17 +13,10 @@ postCategoryRouter.get('/', async (req, res) => {
 				.SetParameters(ContextBuilder.FromParameters(req.query))
 				.Build()
 				.where('post_id', Number(req.params.postId))
-				.first()
 		)
 		.Build();
 
-	const r = await getTable('post_categories');
-
-	console.log(r);
-
-	const rs = req.queue.GetResult('categories');
-
-	console.log(rs, 'the categories');
+	const rs = req.queue.GetResult('categories') || [];
 
 	res.json(rs);
 });

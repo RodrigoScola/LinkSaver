@@ -1,3 +1,4 @@
+import { Post } from 'shared';
 import express from 'express';
 import _ from 'lodash';
 import { getTable } from '../../src/class/utils.js';
@@ -33,12 +34,24 @@ postRouter.get('/:postId', async (req, res) => {
 	res.send(post.value);
 });
 
+const basePost: Post = {
+	created_at: Date.now().toString(),
+	description: '',
+	id: -1,
+	post_url: '',
+	status: 'private',
+	title: '',
+	updated_at: Date.now().toString(),
+	userId: -1,
+	parent: -1,
+};
+
 postRouter.get('/', async (req, res) => {
 	await req.queue
 		.Add(
 			'posts',
 			ContextFactory.fromRequest('posts', getTable('posts'))
-				.SetParameters(ContextBuilder.FromParameters(req.query))
+				.SetParameters(ContextBuilder.FromParameters(req.query, basePost))
 				.Build()
 		)
 		.Build();

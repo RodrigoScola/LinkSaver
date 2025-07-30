@@ -34,6 +34,8 @@ export type Interaction = {
 	updated_at: string;
 };
 
+export type NewInteraction = OmitBy<Interaction, 'id' | 'created_at' | 'updated_at'>;
+
 export type BaseQuery = knex.Knex<any, any[]>;
 
 /**

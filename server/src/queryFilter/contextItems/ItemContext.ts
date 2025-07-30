@@ -23,6 +23,7 @@ export class ItemContextMaker<T extends object, TableName extends TableNames>
 		ContextMaker.setLimit(this.parameters, this.query);
 		ContextMaker.setOrder(this.parameters, this.query);
 		ContextMaker.setFullTextSearch(this.parameters, this.query);
+
 		ContextMaker.setWhere(this.parameters.where, this.query);
 		ContextMaker.setWhereIn(this.parameters, this.query);
 		if (this.parameters.offset && this.parameters.offset > 0 && ParameterActions.LIMIT in this.parameters) {

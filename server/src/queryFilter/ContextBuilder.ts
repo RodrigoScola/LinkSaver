@@ -207,6 +207,7 @@ class QueryBuilderFactorySingleton {
 				this.WhereIn(key, value, tableItem, final);
 				return;
 			}
+
 			this.Where(key, value, tableItem, final);
 		});
 

@@ -1,6 +1,6 @@
 import config from '../../knexfile.cjs';
 import knex from 'knex';
-import { DatabaseQuery, TableNames } from '../../src/queryFilter/types.js';
+import { DatabaseQuery, TableNames } from '../../src/queryFilter/types';
 
 const db = knex(config.development);
 

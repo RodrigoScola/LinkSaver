@@ -10,21 +10,39 @@ import { privatizeItem } from 'src/Storage';
 const foldersRouter = express.Router();
 
 foldersRouter.param('id', async (req, res, next, id) => {
+	const q = ContextFactory.fromRequest('folders', getTable('folders'))
+		.SetParameters(ContextBuilder.FromParameters(req.query))
+		.Build()
+		.where('id', id)
+		.first();
+
+	console.log(q.toQuery());
+
 	req.queue.Add(
 		'folder',
-		ContextFactory.fromRequest('folders', getTable('folders'))
-			.SetParameters(ContextBuilder.FromParameters(req.query))
-			.Build()
-			.where('id', id)
-			.first()
+
+		q
 	);
 
 	next();
 });
 
 foldersRouter.get('/:id', async (req, res) => {
-	// let post = req.post;
-	// res.send(post);
+	await req.queue.Build();
+
+	const folder = req.queue.Get('folder');
+
+	console.log(req.queue);
+
+	console.log(getTable('folders').then(console.log));
+
+	console.log({ folder });
+
+	if (folder.status === 'rejected' || !folder.value) {
+		throw new NotFoundError(`could not find post with that id`);
+	}
+
+	res.send(folder.value);
 });
 foldersRouter.get('/', async (req, res) => {
 	req.queue.Add(
@@ -41,6 +59,8 @@ foldersRouter.get('/', async (req, res) => {
 	if (folders.status === 'rejected' || !folders.value) {
 		throw new NotFoundError('could not complete the operation');
 	}
+
+	console.log(folders.value);
 
 	res.json(folders.value);
 });
