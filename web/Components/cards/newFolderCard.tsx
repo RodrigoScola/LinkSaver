@@ -1,115 +1,98 @@
-import { Box, Button, Input, Flex, Divider, Heading } from "@chakra-ui/react"
-import { FormInput } from "../inputs/FormInput"
-import { ItemColorSelect } from "../inputs/ItemColorSelect"
-import { RenderTag } from "../RenderTag"
-import { VscNewFolder } from "react-icons/vsc"
-import formatter from "../../utils/formatting/formatting"
-import { SearchInput } from "../inputs/SearchInput"
-import { useFolder } from "../../hooks/useFolder"
-import { FolderListInput } from "../List/FolderListInput"
-import { useCallback, useMemo } from "react"
+import { Box, Button, Input, Flex, Divider, Heading, color } from '@chakra-ui/react';
+import { FormInput } from '../inputs/FormInput';
+import { ItemColorSelect } from '../inputs/ItemColorSelect';
+import { RenderTag } from '../RenderTag';
+import { VscNewFolder } from 'react-icons/vsc';
+import formatter from '../../utils/formatting/formatting';
+import { SearchInput } from '../inputs/SearchInput';
+import { useFolders } from '../../hooks/useFolder';
+import { FolderListInput } from '../List/FolderListInput';
+import { useCallback, useEffect, useState } from 'react';
+import { Folder } from 'shared';
 
 type NewFolderCardProps = {
-	name: string,
-	color: string
-
-}
+	folder?: Folder;
+	folders: Folder[];
+	parent_folder?: Folder;
+	onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onSubmit?: () => void;
+	onParentFolderChange?: (folder: Folder) => void;
+	type?: 'create' | 'update';
+};
 
 export const NewFolderCard = ({
-	name,
-	color,
-	onChange: handleChange = () => { },
-	handleSubmit,
-	type = "create",
-	parent_folder,
-}) => {
+	folder,
+	onParentFolderChange,
+	folders,
+	onChange: handleChange = () => {},
+	onSubmit: onSubmit,
+	type = 'create',
+}: NewFolderCardProps) => {
 	const onChange = useCallback(
-		(e) => {
-			handleChange(e)
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			handleChange(e);
 		},
 		[handleChange]
-	)
-	const { folder, newFolder } = useFolder([])
-	const handleResult = (items) => {
-		items.map((i) => newFolder(i))
-	}
-	const handleFolderChange = useCallback(
-		(item) => {
-			if (item.id) {
-				onChange({
-					target: {
-						name: "parent_folder",
-						value: item,
-					},
-				})
-			}
-		},
-		[onChange]
-	)
-	const nfolder = useMemo(() => {
-		let m = []
-		if (folder.length > 0) {
-			m = folder
-		}
-		if (parent_folder?.id) {
-			m = [...m, parent_folder]
-		}
-		return m
-	}, [folder, parent_folder])
+	);
+
+	const folderContext = useFolders();
+
+	const handleResult = (folders: Folder[]) => {
+		for (const folder of folders) folderContext.AddFolder(folder);
+	};
+
 	return (
 		<>
-			<Box color={"black"}>
-				<Flex alignContent={"center"} alignItems={"center"} justifyContent={"space-between"}>
+			<Box color={'black'}>
+				<Flex alignContent={'center'} alignItems={'center'} justifyContent={'space-between'}>
 					<FormInput
-						HelperText={"what is the folder name?"}
-						labelText={"Folder Name"}
-						ErrorMessage={"invalid folder name"}
-					>
+						HelperText={'what is the folder name?'}
+						labelText={'Folder Name'}
+						errorMessage={'invalid folder name'}>
 						<Input
-							placeholder="Default Folder Name"
-							value={name}
+							placeholder='Default Folder Name'
+							value={folder?.title}
 							maxLength={15}
-							name="name"
+							name='name'
 							onChange={onChange}
 							mt={1}
-							justifySelf={"right"}
+							justifySelf={'right'}
 						/>
 					</FormInput>
 
 					<ItemColorSelect
-						name={"color"}
-						HelperText={"Color Code"}
-						labelText={"Folder Color"}
+						name={'color'}
+						HelperText={'Color Code'}
+						labelText={'Folder Color'}
 						pl={3}
-						defaultValue={color || ""}
+						defaultValue={folder?.color || ''}
 						onChange={onChange}
 					/>
 				</Flex>
 				<Divider pt={3} mb={3} />
-				<Flex columnGap={3} flexDir="column">
-					<Heading pb={1} size={"sm"}>
+				<Flex columnGap={3} flexDir='column'>
+					<Heading pb={1} size={'sm'}>
 						Parent Folder
 					</Heading>
-					<FolderListInput folders={nfolder} onChange={handleFolderChange} selected={parent_folder} />
-					<SearchInput type="folders" onResult={handleResult} />
+					<FolderListInput folders={folders} onFolderChange={onParentFolderChange} />
+					<SearchInput type='folders' onResult={handleResult} />
 				</Flex>
-				<Flex justifyContent={"center"} m={"auto"} pt={2} mb={4}>
-					<RenderTag color={color} size="lg">
-						{name}
+				<Flex justifyContent={'center'} m={'auto'} pt={2} mb={4}>
+					<RenderTag color={folder?.color} size='lg'>
+						{folder?.title}
 					</RenderTag>
 				</Flex>
 
-				<Flex mb={2} justifyContent={"center"}>
+				<Flex mb={2} justifyContent={'center'}>
 					<Button
 						shadow={formatter.color.shadows.left}
-						onClick={handleSubmit}
+						onClick={onSubmit}
 						leftIcon={<VscNewFolder />}
-						colorScheme={"whatsapp"}
-					>
-						{type == "update" ? "update folder" : "add new folder"}
+						colorScheme={'whatsapp'}>
+						{type == 'update' ? 'update folder' : 'add new folder'}
 					</Button>
 				</Flex>
 			</Box>
 		</>
-	)
-}
+	);
+};

@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
-import { PostContext, usePost } from '../../context/PostContext';
+import { usePost } from '../../context/PostContext';
 import {
 	Box,
 	Button,
@@ -19,27 +19,37 @@ import { useCategories } from '../../hooks/useCategories';
 import { DeleteButton } from '../Buttons/DeleteButton';
 import { EditPostCard } from './EditPostCard';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { VscEdit, VscSave, VscTrash } from 'react-icons/vsc';
 import formatter from '../../utils/formatting/formatting';
 import { BoxCard } from './BoxCard';
 import { usePostCategory } from '../../hooks/usePostCategories';
 import e from 'express';
 import { Category, PostCategories } from 'shared';
-import { toObj } from '../../utils/formatting/ObjectFormat';
+import { ObjectFormat } from '../../utils/formatting/ObjectFormat';
+import folders from '../../pages/folders';
+import { SelectFolder } from './SelectFolder';
 
 export const PostCard = () => {
 	const { post, isCreator } = usePost();
 	const catContext = useCategories();
-	const dispatch = useDispatch();
 
 	const postCategories = usePostCategory();
 
 	const [currPost, setCurrPost] = useState(post);
 	const closeElement = () => {};
 
+	const onCategoryChange = useCallback(
+		(categories: Category[]) => {
+			//TODO: handle category change
+		},
+		[catContext]
+	);
+
 	const onChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
+			if (!e.target) {
+				return;
+			}
 			setCurrPost((curr) => ({ ...curr, [e.target.name]: e.target.value }));
 		},
 		[setCurrPost]
@@ -66,7 +76,7 @@ export const PostCard = () => {
 					.map((promise) => promise.value)
 					.filter(Boolean);
 
-				setPostCategories(toObj(cats.filter(Boolean) as Category[], 'id'));
+				setPostCategories(ObjectFormat.toObj(cats.filter(Boolean) as Category[], 'id'));
 
 				for (const category of cats) {
 					if (!category) {
@@ -99,23 +109,6 @@ export const PostCard = () => {
 				</Flex>
 			</Box>
 			<Box py={0}>
-				{post?.preview?.images?.length > 0 && (
-					<Flex pb={4} justifyContent={'center'}>
-						<Container
-							justifyContent={'center'}
-							display={'flex'}
-							border={'2px'}
-							borderColor={'white'}>
-							<Img
-								width={'full'}
-								rounded={'2xl'}
-								src={post?.preview?.images[0] || '#'}
-								alt={`post image for the post ${post?.title}`}
-							/>
-						</Container>
-					</Flex>
-				)}
-
 				<RenderCategories categories={Object.values(pcategories)} />
 				<Divider borderWidth={'2px'} mt={3} />
 			</Box>
@@ -145,9 +138,20 @@ export const PostCard = () => {
 									</Button>
 								}
 								headerText={'Edit post'}>
-								<EditPostCard post={post} onChange={onChange} />
+								<EditPostCard
+									categories={Object.values(pcategories)}
+									post={post}
+									onChange={onChange}
+									onCategoryChange={onCategoryChange}
+								/>
+
+								<SelectFolder
+									baseFolders={folders}
+									onChange={}
+									defaultSelected={post.parent}
+								/>
 							</ModalComponent>
-							<Skeleton borderRadius={'12px'} isLoaded={post.title}>
+							<Skeleton borderRadius={'12px'} isLoaded={Boolean(post.title) || false}>
 								<ModalComponent
 									color={'red'}
 									onClose={closeElement}

@@ -20,7 +20,7 @@
 		"jsx": "preserve",
 		"incremental": true
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "Components/cards/BoxCard.tx"],
 	"exclude": ["node_modules"],
 	"references": [
 		{

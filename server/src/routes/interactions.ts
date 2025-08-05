@@ -1,4 +1,5 @@
 import express from 'express';
+import { Interaction } from 'shared';
 import { getTable } from 'src/class/utils';
 import { InternalError, NotFoundError } from 'src/ErrorHandling/ErrorHandler';
 import { ContextBuilder } from 'src/queryFilter/ContextBuilder';
@@ -9,33 +10,20 @@ import { ContextFactory } from 'src/queryFilter/DatabaseContext';
 
 const interactionsRouter = express.Router();
 
-interactionsRouter.use('/:postId/', async (req, res, next) => {
+interactionsRouter.use('/:interactionId/', async (req, res, next) => {
 	req.queue.Add(
 		'interactions',
 		ContextFactory.fromRequest('interactions', getTable('interactions'))
 			.SetParameters(ContextBuilder.FromParameters(req.query))
 			.Build()
-			.where('postId', req.params.postId)
+			.where('id', req.params.interactionId)
 			.first()
 	);
 
 	next();
 });
 
-interactionsRouter.use('/:postId/:interactionId', async (req, res, next) => {
-	req.queue.Add(
-		'interaction',
-		ContextFactory.fromRequest('interactions', getTable('interactions'))
-			.SetParameters(ContextBuilder.FromParameters(req.query))
-			.Build()
-			.where('postId', req.params.postId)
-			.first()
-	);
-
-	next();
-});
-
-interactionsRouter.post('/:postId/', async (req, res, next) => {
+interactionsRouter.post('/', async (req, res, next) => {
 	await req.queue.Build();
 
 	let interaction = req.queue.GetResult('interaction') as Interaction | undefined;
@@ -50,7 +38,7 @@ interactionsRouter.post('/:postId/', async (req, res, next) => {
 
 	res.json(interaction);
 });
-interactionsRouter.get('/:postId/', async (req, res) => {
+interactionsRouter.get('/', async (req, res) => {
 	await req.queue.Build();
 
 	const interactions = req.queue.Get('interactions');
@@ -62,7 +50,7 @@ interactionsRouter.get('/:postId/', async (req, res) => {
 	res.json(interactions);
 });
 
-interactionsRouter.put('/:postId/:interactionId', async (req, res) => {
+interactionsRouter.put('/:interactionId', async (req, res) => {
 	await req.queue.Build();
 
 	const interaction = req.queue.Get('interaction');

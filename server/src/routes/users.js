@@ -63,15 +63,12 @@ usersRouter.get('/:id', async (req, res) => {
 usersRouter.put('/:id', async (req, res) => {
 	await req.queue.Add('updated_user', getTable('users').update(req.body).where('id', req.params.id)).Build();
 
-	console.log('user id', req.queue.results);
-
 	const hasUser = Boolean(req.queue.GetResult('user'));
 
 	if (!hasUser) throw new NotFoundError('could not complete the operation');
 
 	const updatedUserId = req.queue.Get('updated_user');
 	if (updatedUserId.status === 'rejected' || !updatedUserId.value) {
-		console.log(updatedUserId, 'this is the user id');
 		throw new NotFoundError('could not complete the operation');
 	}
 

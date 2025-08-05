@@ -1,15 +1,22 @@
-import { Flex } from '@chakra-ui/react';
+import { Flex, FlexProps } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import { isDifferent } from '../../utils/formatting/utils';
 
 import { Category } from 'shared';
 import { RenderTag } from '../RenderTag';
-export const RenderCategories = ({ categories, ...rest }) => {
-	const renderedTags = useMemo(() => {
-		return categories?.map((category: Category, cat_key) => (
-			<RenderTag key={cat_key} color={category?.color} text={category?.name} />
-		));
-	}, [categories]);
+
+type RenderCategoriesProps = {
+	categories: Category[];
+} & FlexProps;
+
+export const RenderCategories = ({ categories, ...rest }: RenderCategoriesProps) => {
+	const renderedTags = useMemo(
+		() =>
+			categories?.map((category: Category, idx: number) => (
+				<RenderTag key={idx} color={category?.color} text={category?.name} />
+			)),
+		[categories]
+	);
 
 	return (
 		<Flex wrap='wrap' gap={1} {...rest}>

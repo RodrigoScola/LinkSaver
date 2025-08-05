@@ -1,15 +1,11 @@
 import { getData } from '../../class/serverBridge';
-import { useFolder } from '../../hooks/useFolder';
 import { Box, Center, Heading, Grid } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
-import { FolderProvider } from '../../context/FolderContext';
-import { FolderCard } from '../../Components/cards/folderCard';
 import { PostProvider } from '../../context/PostContext';
 import { PostCard } from '../../Components/cards/PostCard';
 import { usePosts } from '../../hooks/usePosts';
 import formatter from '../../utils/formatting/formatting';
 import { BoxCard } from '../../Components/cards/BoxCard';
-import { BoxCardOutline } from '../../Components/cards/BoxCardOutline';
 import { RenderHead } from '../../Components/RenderHead';
 import { Folder, Post } from 'shared';
 
@@ -22,11 +18,11 @@ export default function FOLDERID(p) {
 
 	useEffect(() => {
 		async function go() {
-			const folderData = await getData.getData(`/folders/${p.folderId}`);
+			const folderData = await getData.get(`/folders/${p.folderId}`);
 
 			setCurrFolder(folderData);
 
-			const posts = await getData.getData(`/posts/?parent=${p.folderId}`);
+			const posts = await getData.get(`/posts/?parent=${p.folderId}`);
 
 			for (const post of posts) {
 				pcont.AddPost(post);

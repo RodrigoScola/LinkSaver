@@ -1,13 +1,13 @@
 import { BoxCard } from './cards/BoxCard';
 import { Flex, useOutsideClick } from '@chakra-ui/react';
-import { PostContext, PostProvider } from '../context/PostContext';
+import { PostProvider } from '../context/PostContext';
 import { FolderProvider } from '../context/FolderContext';
 import { AiOutlineTag } from 'react-icons/ai';
 import { FolderList } from './List/FolderList';
 import { SearchInput } from './inputs/SearchInput';
 import { Box } from '@chakra-ui/react';
 import { useCategories } from '../hooks/useCategories';
-import { useFolder } from '../hooks/useFolder';
+import { useFolders } from '../hooks/useFolder';
 import { usePosts } from '../hooks/usePosts';
 
 import { PostList } from './List/PostList';
@@ -15,12 +15,11 @@ import { PostList } from './List/PostList';
 import { VscFolder } from 'react-icons/vsc';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { toArr, toObj } from '../utils/formatting/ObjectFormat';
 import { CategoryList } from './List/CategoryList';
 import { newPost } from '../utils/formatting/utils';
 export const NavSearch = () => {
 	const catContext = useCategories();
-	const { folder, newFolder } = useFolder();
+	const { folder, newFolder } = useFolders();
 
 	const PostCtx = usePosts();
 	const handleResults = useCallback(

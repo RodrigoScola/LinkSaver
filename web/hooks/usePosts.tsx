@@ -1,93 +1,86 @@
-import { NewInteraction, Post, PostCategories } from 'shared'
+import { NewInteraction, PartialBy, Post, PostCategories } from 'shared';
 import { createContext, useContext, useState } from 'react';
 import _ from 'lodash';
 import { getData } from '../class/serverBridge';
 
-
 type IPostContext = {
-	GetPostsByIds: (ids: number[]) => Promise<any>,
-	GetPost: (id: number) => Promise<void>
-	UpdatePost: (post: Post) => Promise<void>
-	AddPost: (posts: Post) => void
-	AddLike: (postId: number, userId: number) => Promise<void>
-	Posts: () => Record<number, Post>
+	GetPostsByIds: (ids: number[]) => Promise<any>;
+	GetPost: (id: number) => Promise<void>;
+	UpdatePost: (post: Post) => Promise<void>;
+	AddPost: (posts: Post) => void;
 
-	GetCategories: (postId: number) => Promise<PostCategories[]>
-}
+	PostPost: (post: PartialBy<Post, 'id'>) => Promise<void>;
+	Posts: () => Record<number, Post>;
 
-
-
-
+	// GetCategories: (postId: number) => Promise<PostCategories[]>;
+};
 
 const PostsContext = createContext<IPostContext | null>(null);
 
 export const PostsProvider = ({ children }: { children: any }) => {
 	const [posts, setPosts] = useState<Record<number, Post>>({});
 
-	const [postCategories, setPostsCategories] = useState<Record<number, PostCategories[]>>([])
-
-
 	function GetPostsByIds(ids: number[]) {
-		return Promise.allSettled(ids.map(id => getData.getData(`/posts/${id}`)))
+		return Promise.allSettled(ids.map((id) => getData.get(`/posts/${id}`)));
 	}
 	async function GetPost(id: number) {
-		const post = await getData.getData(`/posts/${id}`)
+		const post = await getData.get(`/posts/${id}`);
 
 		if (!('id' in post)) {
-			console.error(`invalid post`, post)
+			console.error(`invalid post`, post);
 			return;
 		}
 
-		AddPost(post)
+		AddPost(post);
+	}
+
+	async function CreatePost(post: PartialBy<Post, 'id'>) {
+		const newPost = await getData.post('/posts', post);
+		AddPost(newPost);
 	}
 
 	async function UpdatePost(post: Post) {
-		const updated = await getData.update('posts', post.id, post)
-		AddPost(updated)
+		const updated = await getData.update(`/posts/${post.id}`, post);
+
+		if (!updated || typeof updated !== 'object' || !('id' in updated)) {
+			console.error(`invalid post`, updated);
+			return;
+		}
+		AddPost(updated as Post);
 	}
-
-
 
 	function AddPost(post: Post) {
-		setPosts(curr => ({ ...curr, [post.id]: post }))
+		setPosts((curr) => ({ ...curr, [post.id]: post }));
 	}
 
-	async function AddLike(postId: number, userId: number) {
-		//todo: make an interactions thing
-		await getData.post('interactions', { postId: postId, status: 'public', userId, type: 'like' } as NewInteraction)
-		//TODO: update the interactions
-	}
+	// async function GetCategories(id: number) {
+	// 	return id in postCategories
+	// 		? Promise.resolve(postCategories[id])
+	// 		: getData.get(`/posts/${id}/categories`);
+	// }
 
-	async function GetCategories(id: number) {
-		return id in postCategories ? Promise.resolve(postCategories[id]) : getData.getData(`/posts/${id}/categories`)
-	}
-
-
-
-
-
-	return <PostsContext.Provider value={{
-		UpdatePost,
-		Posts: () => posts,
-		AddLike,
-		AddPost,
-		GetPostsByIds,
-		GetCategories,
-		GetPost
-
-	}}>{children}</PostsContext.Provider>;
+	return (
+		<PostsContext.Provider
+			value={{
+				UpdatePost,
+				Posts: () => posts,
+				AddPost,
+				PostPost: CreatePost,
+				GetPostsByIds,
+				// GetCategories,
+				GetPost,
+			}}>
+			{children}
+		</PostsContext.Provider>
+	);
 };
 
-
-
-
 export const usePosts = () => {
-
-	const ctx = useContext(PostsContext)
+	const ctx = useContext(PostsContext);
 
 	if (!ctx) {
-		throw new Error("invalid Context for posts")
+		throw new Error('invalid Context for posts');
 	}
 
-	return ctx
+	return ctx;
 };

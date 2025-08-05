@@ -1,116 +1,92 @@
-import { Box, Input, InputGroupProps, useBoolean, useColorMode } from '@chakra-ui/react';
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useFetch } from '../../hooks/useFetch';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-	addSearchInput,
-	selectSearch,
-	updateSearchData,
-	updateSearchResults,
-} from '../../store/search/SearchSlice';
+import { Box, Input, InputGroupProps, useColorMode } from '@chakra-ui/react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { InputGroup, InputLeftElement } from '@chakra-ui/react';
 import { Search2Icon } from '@chakra-ui/icons';
-import { add_categories } from '../../store/category/CategorySlice';
-import { obj } from '../../utils/formatting/ObjectFormat';
+import { useSearch } from '../../context/SearchContext';
+import { useQuery } from '@tanstack/react-query';
+import { getData } from '../../class/serverBridge';
+import { query } from 'express';
 
-const sliceterm = 'categorySearch';
+const sliceName = 'categorySearch';
 
 let timer: NodeJS.Timeout | null = null;
 
-export const SearchInput = ({ type = 'categories', params = {}, onResult = () => { }, ...props }: {
+//TODO: TEST THIS OUT
 
-	type: 'categories',
-
-	params: Record<string, any>,
-	onResult: (result: any) => any
-
-
-
+export const SearchInput = ({
+	type = 'categories',
+	onResult = () => {},
+	name = '',
+	...props
+}: {
+	type?: string;
+	name: string;
+	onResult: (result: any) => any;
 } & InputGroupProps) => {
 	const { colorMode } = useColorMode();
+
 	const [searchTerm, setSearchTerm] = useState('');
-	const { data, setUrl } = useFetch('');
-	const dispatch = useDispatch();
-	const term = useSelector(selectSearch);
-	const [__, setErrMessage] = useState('');
-	const [_, setVisited] = useBoolean(false);
-	const inputRef = useRef<HTMLInputElement | null>(null);
-	const items = useMemo(() => term[sliceterm], [term]);
-	useEffect(() => {
-		dispatch(addSearchInput(sliceterm));
-	}, [dispatch]);
 
-	const OnResultCb = useCallback((result: any) => onResult(result), [onResult]);
+	function getUrl() {
+		const query = new URLSearchParams();
 
-	const nparams = useMemo(() => params, [params]);
-	const handleChange = useCallback(
-		(e: ChangeEvent<HTMLInputElement>) => {
+		//TODO: FIX THIS BECAUSE THIS DOESNT WORK
+		query.set('s', searchTerm);
 
-			if (!inputRef.current) return
+		return `${type}?${query.toString()}`;
+	}
 
-			dispatch(
-				updateSearchData({
-					name: sliceterm,
-					term: inputRef.current.value,
-				})
-			);
-			if (timer) {
-				clearTimeout(timer);
-			}
+	const searchContext = useQuery({
+		queryKey: [sliceName],
+		queryFn: () => getData.get(getUrl()),
+		refetchOnWindowFocus: false,
+		enabled: false,
+	});
 
-			timer = setTimeout(() => setSearchTerm(inputRef.current?.value || ''), 500);
-		},
-		[dispatch]
-	);
-	useEffect(() => {
-		if (searchTerm) {
-			setUrl(
-				type +
-				'/' +
-				obj.toQuery({
-					s: searchTerm,
-					...nparams,
-				})
-			);
+	const searchInput = useRef<HTMLInputElement | null>(null);
+	const sc = useSearch();
+
+	const updateSearchTerm = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		if (!searchInput.current) {
+			console.error(`could not locate search input`);
+			return;
 		}
-	}, [searchTerm, type, setUrl, nparams]);
+
+		sc.UpdateSearchData({
+			name: sliceName,
+			term: searchInput.current.value,
+			results: sc.getSearch(sliceName).results,
+		});
+
+		if (timer) {
+			clearTimeout(timer);
+		}
+
+		timer = setTimeout(() => setSearchTerm(searchInput.current?.value || ''), 500);
+	}, []);
+
+	useEffect(() => {}, [searchTerm, type]);
+
 	useEffect(() => {
 		try {
-			if (!data) {
-				return
+			if (!searchContext.data) {
+				return;
 			}
-			if (!Array.isArray(data) || (data as Array<any>).length == 0) {
-
-				setErrMessage('No results found');
-				return
-			}
-			setErrMessage('');
-			dispatch(
-				updateSearchResults({
-					name: sliceterm,
-					results: data,
-				})
-			);
-			if (type == 'categories') {
-				dispatch(add_categories(data));
+			if (!Array.isArray(searchContext.data)) {
+				return;
 			}
 
+			sc.UpdateSearchData({
+				name: sliceName,
+				results: searchContext.data,
+				term: sc.getSearch(sliceName).term,
+			});
+
+			onResult(searchContext.data);
 		} catch (err) {
-			if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') {
-				setErrMessage(err.message);
-			}
+			console.error(err);
 		}
-	}, [data, dispatch, type]);
-
-	const results = useMemo(() => {
-		if (!items) return [];
-		return obj.toArr(items.results);
-	}, [items]);
-
-	useEffect(() => {
-		if (results) OnResultCb(results);
-
-	}, [results]);
+	}, [searchContext.data]);
 
 	return (
 		<>
@@ -118,9 +94,9 @@ export const SearchInput = ({ type = 'categories', params = {}, onResult = () =>
 				<Input
 					borderColor={colorMode == 'dark' ? 'whiteAlpha.400' : 'blackAlpha.700'}
 					rounded={'3xl'}
-					onFocus={setVisited.on}
-					ref={inputRef}
-					onChange={handleChange}
+					ref={searchInput}
+					name={name}
+					onChange={updateSearchTerm}
 				/>
 				{/* {errMesage !== "" ? errMesage : null} */}
 				<InputLeftElement

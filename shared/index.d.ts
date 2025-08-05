@@ -21,15 +21,16 @@ declare global {
 		}
 	}
 }
+export type PostInteraction = {
+	like: number;
+};
 
 export type Interaction = {
 	id: number;
 	type: 'like';
 	userId: number;
 	postId: number;
-
 	status: 'public' | 'private';
-
 	created_at: string;
 	updated_at: string;
 };

@@ -16,8 +16,6 @@ foldersRouter.param('id', async (req, res, next, id) => {
 		.where('id', id)
 		.first();
 
-	console.log(q.toQuery());
-
 	req.queue.Add(
 		'folder',
 
@@ -31,12 +29,6 @@ foldersRouter.get('/:id', async (req, res) => {
 	await req.queue.Build();
 
 	const folder = req.queue.Get('folder');
-
-	console.log(req.queue);
-
-	console.log(getTable('folders').then(console.log));
-
-	console.log({ folder });
 
 	if (folder.status === 'rejected' || !folder.value) {
 		throw new NotFoundError(`could not find post with that id`);
@@ -59,8 +51,6 @@ foldersRouter.get('/', async (req, res) => {
 	if (folders.status === 'rejected' || !folders.value) {
 		throw new NotFoundError('could not complete the operation');
 	}
-
-	console.log(folders.value);
 
 	res.json(folders.value);
 });

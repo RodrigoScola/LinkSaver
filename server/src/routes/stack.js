@@ -1,8 +1,6 @@
 import express from 'express';
 
 import { stackHandler } from '../class/StackExchange.js';
-// import { categoryTable } from "../datbase/CategoryTable.js"
-// import { newCategory } from "../class/records/categoryRecord.js"
 
 const stackRouter = express.Router();
 

@@ -18,7 +18,7 @@ export const PostCategoryProvider = ({ children }) => {
 			return postCategories[postId];
 		}
 
-		const cats = (await getData.getData(`/posts/${postId}/categories`)) || [];
+		const cats = (await getData.get(`/posts/${postId}/categories`)) || [];
 
 		setPostCategories((curr) => ({ ...curr, [postId]: cats || [] }));
 

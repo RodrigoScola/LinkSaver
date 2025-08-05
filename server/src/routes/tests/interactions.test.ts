@@ -1,14 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { App, dbconnection } from '../../__tests__/vitest.setup';
+import { OmitBy, Interaction } from 'shared';
+import { getTable } from 'src/class/utils';
 
-describe.only('rotas de usuarios', () => {
+describe.only('rotas de interacoes', () => {
 	it.only('can create interaction', async () => {
 		const user = await dbconnection('users').first();
 		const post = await dbconnection('posts').first();
 		expect(post, 'could not grab post').toBeDefined();
 		expect(user, 'could not grab user').toBeDefined();
 
-		const response = await App.post(`/interactions/${post!.id}`).send({
+		const response = await App.post(`/interactions/`).send({
 			created_at: Date.now(),
 			postId: post!.id,
 			status: 'public',
@@ -17,6 +19,43 @@ describe.only('rotas de usuarios', () => {
 			userId: user!.id,
 		} as unknown as OmitBy<Interaction, 'id'>);
 		expect(response.statusCode).eq(200);
+	});
+
+	it.only('correctly counts the interactions', async () => {
+		const user = await dbconnection('users').first();
+		const post = await dbconnection('posts').first();
+		expect(post, 'could not grab post').toBeDefined();
+		expect(user, 'could not grab user').toBeDefined();
+
+		await Promise.all([
+			App.post(`/interactions/`).send({
+				created_at: Date.now(),
+				postId: post!.id,
+				status: 'public',
+				type: 'like',
+				updated_at: Date.now(),
+				userId: user!.id,
+			}),
+			App.post(`/interactions/`).send({
+				created_at: Date.now(),
+				postId: post!.id,
+				status: 'public',
+				type: 'like',
+				updated_at: Date.now(),
+				userId: user!.id++,
+			}),
+		]);
+
+		const totalLikes = await getTable('interactions')
+			.where('type', 'like')
+			.andWhere('postId', post!.id)
+			.count('* as total')
+			.first();
+
+		const response = await App.get(`/posts/${post!.id}/interactions`);
+
+		expect(response.statusCode).eq(200);
+		expect(response.body.like).eq(totalLikes.total);
 	});
 
 	// it('cria um usuario', async () => {

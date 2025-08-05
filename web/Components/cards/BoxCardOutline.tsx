@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import { BoxCard } from './BoxCard';
-export const BoxCardOutline = ({ children, width = '5px', ...props }) => {
+import { BoxProps } from '@chakra-ui/react';
+
+type BoxCardOutlineProps = {
+	children: React.ReactNode;
+	width?: string;
+} & BoxProps;
+
+export const BoxCardOutline = ({ children, width = '5px', ...props }: BoxCardOutlineProps) => {
 	const w = useMemo(() => Number(width.replace(/[^0-9]/gi, '')), [width]);
 
 	return (
@@ -12,7 +19,7 @@ export const BoxCardOutline = ({ children, width = '5px', ...props }) => {
 			}}
 			py={4}
 			borderWidth={width}
-			direction='default'
+			direction='up'
 			w={'fit-content'}
 			margin={'auto'}
 			px={'5'}

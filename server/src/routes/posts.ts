@@ -9,7 +9,6 @@ import { privatizeItem } from '../../src/Storage';
 const postRouter = express.Router();
 
 postRouter.param('postId', async (req, res, next, id) => {
-	console.log(req);
 	req.queue.Add(
 		'post',
 		ContextFactory.fromRequest('posts', getTable('posts'))
@@ -32,6 +31,31 @@ postRouter.get('/:postId', async (req, res) => {
 	}
 
 	res.send(post.value);
+});
+postRouter.get('/:postId/interactions', async (req, res) => {
+	req.queue.Add(
+		'post_interactions',
+		getTable('interactions').select('type').count('type as count').groupBy('type')
+	);
+
+	await req.queue.Build();
+
+	const interactions = req.queue.Get('post_interactions');
+
+	if (interactions.status === 'rejected' || !interactions.value || !Array.isArray(interactions.value)) {
+		throw new NotFoundError(`could not find interactions for post with that id`);
+	}
+
+	const groupedInteractions = interactions.value.reduce((acc, interaction) => {
+		const type = interaction.type;
+		if (!acc[type]) {
+			acc[type] = 0;
+		}
+		acc[type] += interaction.count;
+		return acc;
+	}, {});
+
+	res.json(groupedInteractions);
 });
 
 const basePost: Post = {

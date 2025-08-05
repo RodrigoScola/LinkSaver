@@ -1,37 +1,32 @@
-import { Button, Spinner, } from "@chakra-ui/react"
-import { useContext } from "react"
-import { VscTrash } from "react-icons/vsc"
-import { PostContext, usePost } from "../../context/PostContext"
-import { useFetch } from "../../hooks/useFetch"
+import { Button, Spinner } from '@chakra-ui/react';
+import { VscTrash } from 'react-icons/vsc';
+import { usePost } from '../../context/PostContext';
+import { useQuery } from '@tanstack/react-query';
+import { getData } from '../../class/serverBridge';
 export const DeleteButton = ({ ...props }) => {
+	const post = usePost();
 
-
-	const post = usePost()
-
-	const { data, isLoading, setUrl } = useFetch("", {
-		method: "DELETE",
-	})
+	const fetchCtx = useQuery({
+		queryKey: ['deletePost'],
+		queryFn: () => getData.delete(`/posts/${post.post.id}`),
+		refetchOnWindowFocus: false,
+		initialData: null,
+		enabled: false,
+	});
 
 	const deletePost = () => {
-		if (data) {
-			setUrl("")
-		} else {
-			const postId = post.post.id
-
-			setUrl("/posts/" + postId)
-		}
-	}
+		fetchCtx.refetch();
+	};
 
 	return (
 		<Button
 			{...props}
-			colorScheme={"red"}
-			variant={"outline"}
-			rightIcon={isLoading == true ? <></> : <VscTrash />}
-			isDisabled={isLoading}
-			onClick={deletePost}
-		>
-			{isLoading == true ? <Spinner /> : "Delete"}
+			colorScheme={'red'}
+			variant={'outline'}
+			rightIcon={fetchCtx.isLoading ? <></> : <VscTrash />}
+			isDisabled={fetchCtx.isLoading}
+			onClick={deletePost}>
+			{fetchCtx.isLoading ? <Spinner /> : 'Delete'}
 		</Button>
-	)
-}
+	);
+};
