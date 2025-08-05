@@ -26,7 +26,7 @@ export default function FoldersPage() {
 				{folders.length > 0 &&
 					folders.map((folder, i) => (
 						<Suspense key={'folder' + i} fallback={<Text>Loading</Text>}>
-							<FolderProvider folder={folder}>
+							<FolderProvider baseFolder={folder}>
 								<FolderCard />
 							</FolderProvider>
 						</Suspense>

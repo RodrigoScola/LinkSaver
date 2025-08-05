@@ -11,7 +11,7 @@ import { Folder, Post } from 'shared';
 
 // { folder: baseFolder, posts: basePosts }: { folder: Folder; posts: Post[] }
 
-export default function FOLDERID(p) {
+export default function FOLDERID(p: { folderId: number }) {
 	const [baseFolder, setCurrFolder] = useState<Folder | null>();
 
 	const pcont = usePosts();
@@ -80,7 +80,7 @@ export default function FOLDERID(p) {
 						}}
 						py={2}
 						borderWidth={'5px'}
-						direction='default'
+						direction='up'
 						w={'fit-content'}
 						margin={'auto'}
 						px={'5'}
@@ -109,7 +109,7 @@ export default function FOLDERID(p) {
 	);
 }
 
-export const getServerSideProps = async (context) => {
+export const getServerSideProps = async (context: { params: { id: any } }) => {
 	return {
 		props: {
 			folderId: Number(context.params.id),

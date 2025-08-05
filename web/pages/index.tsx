@@ -122,7 +122,7 @@ export const getServerSideProps = async () => {
 	const folders: Post[] = await getData.get('/folders');
 
 	const postCategories = await Promise.allSettled(
-		posts.map((post) => getData.get(`/posts/${post.id}/categories`))
+		posts.map((post) => getData.get(`/postCategories/?post_id=${post.id}`))
 	);
 
 	const categories = (

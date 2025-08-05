@@ -1,53 +1,75 @@
-import { Tooltip } from "@chakra-ui/react"
-import { IconButton } from "@chakra-ui/react"
-import { CheckIcon } from "@chakra-ui/icons"
-import { useContext } from "react"
-import { PostContext, usePost } from "../../context/PostContext"
-import { useInteraction } from "../../hooks/useInteraction"
-import { color } from "../../utils/formatting/ColorFormat"
-import { useUsers } from "../../hooks/useUser"
+import { Tooltip } from '@chakra-ui/react';
+import { IconButton } from '@chakra-ui/react';
+import { CheckIcon } from '@chakra-ui/icons';
+import { useState } from 'react';
+import { usePost } from '../../context/PostContext';
+import { useInteraction } from '../../hooks/useInteraction';
+import { color } from '../../utils/formatting/ColorFormat';
+import { useUsers } from '../../hooks/useUser';
+import { useQuery } from '@tanstack/react-query';
 export const LikeButton = ({ isDisabled = true, testing = false, ...props }) => {
-	const post = usePost()
+	const post = usePost();
 
-	const [{ loggedIn }] = useUsers()
+	//TODO: ADD USER HERE
+	const [userId, setUserId] = useState<number>(-1);
 
-	const { interactions, addLike } = useInteraction(post.post.id)
+	const user = useUsers();
+
+	const interactions = useInteraction();
 
 	const nlike = async () => {
-		await addLike()
-	}
+		//TODO: ADD USER ID HERE
+		await interactions.AddLike(post.post.id, -1);
+	};
 
-	if (typeof interactions?.like?.id == "number") {
+	const userPostInteractionFetcher = useQuery({
+		queryKey: ['userPostInteraction', post.post.id, userId],
+		queryFn: () => interactions.GetPostInteractionOfUser(post.post.id, userId),
+		refetchOnWindowFocus: false,
+		initialData: {
+			like: 0,
+		},
+	});
+
+	if (userPostInteractionFetcher.data?.like > 0) {
 		return (
-			<Tooltip label={testing && "you need to be logged in to use me"}>
+			<Tooltip label={testing && 'you need to be logged in to use me'}>
 				<IconButton
 					aria-label=''
-					isDisabled={loggedIn == false && isDisabled}
+					isDisabled={user.loggedIn == false && isDisabled}
 					onClick={nlike}
 					shadow={color.shadows.left}
-					backgroundColor={"yellow.200"}
-					variant={"outline"}
-					icon={<CheckIcon textShadow={"2px 2px #fff"} _hover={{ color: "yellow.200" }} color={"white"} />}
-					colorScheme={"yellow"}
+					backgroundColor={'yellow.200'}
+					variant={'outline'}
+					icon={
+						<CheckIcon
+							textShadow={'2px 2px #fff'}
+							_hover={{ color: 'yellow.200' }}
+							color={'white'}
+						/>
+					}
+					colorScheme={'yellow'}
 					{...props}
 				/>
 			</Tooltip>
-		)
+		);
 	}
 	return (
 		<>
-			<Tooltip borderRadius={"xl"} label={loggedIn == false && "You need to be logged in to like this post"}>
+			<Tooltip
+				borderRadius={'xl'}
+				label={user.loggedIn == false && 'You need to be logged in to like this post'}>
 				<IconButton
-					isDisabled={loggedIn == false && isDisabled}
+					isDisabled={user.loggedIn == false && isDisabled}
 					onClick={nlike}
 					aria-label=''
 					shadow={color.shadows.right}
-					variant={"outline"}
+					variant={'outline'}
 					icon={<CheckIcon />}
-					colorScheme={typeof interactions?.like?.id == "number" ? "yellow" : "green"}
+					colorScheme={'green'}
 					{...props}
 				/>
 			</Tooltip>
 		</>
-	)
-}
+	);
+};

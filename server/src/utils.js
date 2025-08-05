@@ -1,11 +1,11 @@
-import path from 'path'
-import fs from 'fs'
+import path from 'path';
+import fs from 'fs';
 
 export const loopAsync = async (obj, callable) => {
 	if (!Array.isArray(obj)) {
 		const returned = await callable(obj);
 
-		if (typeof returned !== "undefined") {
+		if (typeof returned !== 'undefined') {
 			obj = returned;
 		}
 		return obj;
@@ -15,7 +15,7 @@ export const loopAsync = async (obj, callable) => {
 		const currObj = obj[i];
 		const returned = callable(currObj);
 
-		if (typeof returned !== "undefined") {
+		if (typeof returned !== 'undefined') {
 			nobj.push(returned);
 		}
 	}
@@ -31,7 +31,7 @@ export function deepSearch(object, key, predicate = null) {
 	}
 	for (let i = 0; i < Object.keys(object).length; i++) {
 		let value = object[Object.keys(object)[i]];
-		if (typeof value === "object" && value != null) {
+		if (typeof value === 'object' && value != null) {
 			let o = deepSearch(object[Object.keys(object)[i]], key, predicate);
 			if (o != null) return o;
 		}
@@ -41,12 +41,12 @@ export function deepSearch(object, key, predicate = null) {
 
 export const getRandom = (type) => {
 	const file = JSON.parse(
-		fs.readFileSync(path.join(__dirname, "/class/basedata.json"), {
-			encoding: "utf-8",
+		fs.readFileSync(path.join(__dirname, '/class/basedata.json'), {
+			encoding: 'utf-8',
 		})
 	);
 	switch (type) {
-		case "color":
+		case 'color':
 			const obj = file[type];
 			const randomNum = Math.floor(Math.random() * obj.length);
 			return obj[randomNum];
@@ -58,12 +58,12 @@ export const getRandom = (type) => {
 const postsColumns = {
 	id: 0,
 	createdAt: Date.now(),
-	title: "",
+	title: '',
 	categories: [],
-	user_id: "",
-	post_url: "",
-	status: "",
-	likes: "",
+	user_id: '',
+	post_url: '',
+	status: '',
+	likes: '',
 	extended: {
 		id: 0,
 		created_at: Date.now(),
@@ -78,8 +78,7 @@ const postsColumns = {
 /** @param {string} type */
 export function getColumns(type) {
 	switch (type) {
-		case "posts":
-			return [""];
+		case 'posts':
+			return [''];
 	}
 }
-

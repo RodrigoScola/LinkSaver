@@ -19,10 +19,8 @@ import utilRouter from './routes/_.js';
 // import searchRouter from './routes/search.js';
 import { ErrorHandler } from './ErrorHandling/ErrorHandler.js';
 import { AsyncQueue } from './class/async';
-import { dbconnection } from './__tests__/vitest.setup';
 import { getTable } from './class/utils';
 import { postCategoryRouter } from './routes/post_category';
-import postRouter from './routes/posts.js';
 import { Category, Post, PostCategories } from 'shared';
 app.use(cors());
 app.use(bodyParser.json());
@@ -32,20 +30,13 @@ app.use('/', (req, _, next) => {
 
 	next();
 });
-postRouter.use('/:postId/categories', postCategoryRouter);
+app.use('/postCategories/', postCategoryRouter);
 
 app.use('/_', utilRouter);
-// app.use("/categories", queryRouter)
-// app.use("/folders", queryRouter)
-// app.use("/search", queryRouter)
 app.use('/folders', foldersRouter);
-// app.use("/posts", queryRouter)
-// app.use("/interactions", queryRouter)
-// app.use("/users", queryRouter)
 app.use('/categories', categoryRouter);
 
 app.use('/posts', postsRouter);
-// app.use('/search', searchRouter);
 app.use('/users', usersRouter);
 app.use('/stack', stackRouter);
 app.use('/interactions', interactionsRouter);

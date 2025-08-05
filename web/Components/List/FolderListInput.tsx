@@ -2,7 +2,7 @@ import { RadioGroup, Radio, ListItem, List, RadioGroupProps } from '@chakra-ui/r
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { ObjectFormat } from '../../utils/formatting/ObjectFormat';
-import { Folder } from 'shared';
+import { Folder, OmitBy } from 'shared';
 
 export const FolderListInput = ({
 	folders = [],
@@ -15,7 +15,7 @@ export const FolderListInput = ({
 	onFolderChange: (folder: Folder) => void;
 	children?: ReactNode;
 	defaultSelected?: Folder;
-} & RadioGroupProps) => {
+} & OmitBy<RadioGroupProps, 'children'>) => {
 	const [selected, setSelected] = useState<Folder | undefined>(selectedItem);
 
 	const handleChange = useCallback(

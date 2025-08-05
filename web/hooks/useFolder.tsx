@@ -2,7 +2,6 @@ import { createContext, ReactNode, useCallback, useContext, useState } from 'rea
 import _ from 'lodash';
 import { Folder, PartialBy } from 'shared';
 import { getData } from '../class/serverBridge';
-import { addFolder } from '../store/folder/FolderSlice';
 
 type IFolderContext = {
 	GetFolder: (id: number) => Promise<Folder | undefined>;
@@ -43,13 +42,13 @@ export const FolderProvider = ({ children }: { children: ReactNode }) => {
 
 	async function CreateFolder(folder: PartialBy<Folder, 'id'>) {
 		const newFolder = await getData.post('/folders', folder);
-		addFolder(newFolder);
+		AddFolder(newFolder);
 
 		return newFolder;
 	}
 
-	function AddFolder(flder: Folder) {
-		setFolders((curr) => ({ ...curr, [flder.id]: flder }));
+	function AddFolder(folder: Folder) {
+		setFolders((curr) => ({ ...curr, [folder.id]: folder }));
 	}
 
 	return (

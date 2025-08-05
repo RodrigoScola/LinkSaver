@@ -24,13 +24,17 @@ import formatter from '../../utils/formatting/formatting';
 import { BoxCard } from './BoxCard';
 import { usePostCategory } from '../../hooks/usePostCategories';
 import e from 'express';
-import { Category, PostCategories } from 'shared';
+import { Category, Folder, PostCategories } from 'shared';
 import { ObjectFormat } from '../../utils/formatting/ObjectFormat';
 import folders from '../../pages/folders';
 import { SelectFolder } from './SelectFolder';
+import { getData } from '../../class/serverBridge';
+import { useQuery } from '@tanstack/react-query';
+import { useUsers } from '../../hooks/useUser';
 
 export const PostCard = () => {
-	const { post, isCreator } = usePost();
+	const { post, isCreator, update: updatePost } = usePost();
+
 	const catContext = useCategories();
 
 	const postCategories = usePostCategory();
@@ -93,9 +97,20 @@ export const PostCard = () => {
 	}, [post.id]);
 
 	const updatePo = () => {
+		//TODO: server side post
+
 		alert('todo: server side post');
 		// dispatch(serverSavePost(currPost));
 	};
+
+	const user = useUsers();
+
+	const foldersFetcher = useQuery({
+		queryKey: ['folders', user.user.id],
+		queryFn: () => getData.get(`/folders/?userId=${user.user.id}`),
+		refetchOnWindowFocus: false,
+		initialData: [],
+	});
 
 	return (
 		<BoxCard height={'fit-content'} minW={'200px'} w={'30%'} p={3} maxW={'400px'}>
@@ -118,7 +133,7 @@ export const PostCard = () => {
 					{isCreator ? (
 						<>
 							<ModalComponent
-								color={'purple'}
+								// color={'purple'}
 								onClose={closeElement}
 								footerElement={
 									<Button
@@ -146,14 +161,18 @@ export const PostCard = () => {
 								/>
 
 								<SelectFolder
-									baseFolders={folders}
-									onChange={}
-									defaultSelected={post.parent}
+									baseFolders={foldersFetcher.data}
+									onChange={(f) => updatePost({ ...post, parent: f.id })}
+									defaultSelected={
+										foldersFetcher.data?.find(
+											(folder: Folder) => folder.id === post.parent
+										) || null
+									}
 								/>
 							</ModalComponent>
 							<Skeleton borderRadius={'12px'} isLoaded={Boolean(post.title) || false}>
 								<ModalComponent
-									color={'red'}
+									// color={'red'}
 									onClose={closeElement}
 									footerElement={<DeleteButton />}
 									triggerElement={
@@ -167,7 +186,7 @@ export const PostCard = () => {
 									}
 									headerText={
 										<Heading size={'xl'}>
-											Are you sure you want to delete this?
+											Are you sure you want to delete this post?
 										</Heading>
 									}></ModalComponent>
 							</Skeleton>

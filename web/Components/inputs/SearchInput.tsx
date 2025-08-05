@@ -21,7 +21,7 @@ export const SearchInput = ({
 }: {
 	type?: string;
 	name: string;
-	onResult: (result: any) => any;
+	onResult: (result: any) => void;
 } & InputGroupProps) => {
 	const { colorMode } = useColorMode();
 

@@ -9,10 +9,15 @@ export function useObject<T>(initialState?: T) {
 		});
 	}, []);
 
+	const Set = useCallback((newObject: T) => {
+		setObject(newObject);
+	}, []);
+
 	return useMemo(
 		() => ({
 			value: value,
 			update: updateObject,
+			set: Set,
 		}),
 		[value, updateObject]
 	);

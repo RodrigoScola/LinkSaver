@@ -16,6 +16,8 @@ import { FolderProvider } from '../../context/FolderContext';
 import { usePosts } from '../../hooks/usePosts';
 import { useFolders } from '../../hooks/useFolder';
 import folders from '../folders';
+import { $ } from 'bun';
+import { count } from 'console';
 
 const user = {
 	id: -1,
@@ -37,7 +39,10 @@ export default function USERNAMEPAGE({}) {
 
 	const posts = useQuery({
 		queryKey: ['posts', user.id],
-		queryFn: () => getData.get(`/posts/?count=8&user_id=${user.id}&order=desc`),
+		queryFn: () =>
+			getData.get(
+				`/posts/?count=8&user_id=${user.id}&order=desc&from=${Object.values(postCtx.Posts()).length}`
+			),
 		refetchOnWindowFocus: false,
 	});
 	const folders = useQuery({
@@ -90,7 +95,7 @@ export default function USERNAMEPAGE({}) {
 			<SimpleGrid spacingX={'40px'} spacingY={'20px'} columns={10} minChildWidth={'100px'}>
 				{Object.values(folderCtx.GetFolders())?.map((item, ind) => {
 					return (
-						<FolderProvider key={ind} folder={item}>
+						<FolderProvider key={ind} baseFolder={item}>
 							<FolderCard />
 						</FolderProvider>
 					);
@@ -138,7 +143,8 @@ export default function USERNAMEPAGE({}) {
 						shadow={'-3px 3px'}
 						size={'lg'}
 						rounded={'3xl'}
-						onClick={handleMorePosts}>
+						//TODO: PROB HAS A BUG
+						onClick={() => posts.refetch()}>
 						Load More
 					</Button>
 				</Flex>

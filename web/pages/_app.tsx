@@ -12,9 +12,10 @@ import { PostCategoryProvider } from '../hooks/usePostCategories';
 import { FolderProvider } from '../hooks/useFolder';
 import { NotificationProvider } from '../hooks/useNotifications';
 import { InteractionsProvider } from '../hooks/useInteraction';
+import { AppProps } from 'next/app';
 const Footer = dynamic(() => import('../Components/Footer').then((res) => res.Footer));
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
 	const [currUser, setUser] = useState({ id: null });
 
 	return (

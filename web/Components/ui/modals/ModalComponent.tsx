@@ -15,10 +15,12 @@ import { Button } from '@chakra-ui/react';
 import { BoxCard } from '../../cards/BoxCard';
 import { MouseEvent, ReactNode } from 'react';
 
+//TODO: Figure out where the color would be
+
 export type ModalComponentProps = {
-	onClose: (e?: MouseEvent) => void;
+	onClose?: (e?: MouseEvent) => void;
 	footerElement?: ReactNode;
-	headerText?: string;
+	headerText?: string | ReactNode;
 	triggerElement?: ReactNode;
 	children?: ReactNode;
 };
@@ -29,6 +31,7 @@ export const ModalComponent = ({
 	headerText,
 	triggerElement,
 	children,
+
 	...rest
 }: ModalComponentProps) => {
 	const { isOpen, onClose, onOpen } = useDisclosure();

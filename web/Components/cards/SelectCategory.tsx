@@ -7,17 +7,12 @@ import { TagInput } from '../inputs/TagInput/TagInput';
 import { useCallback, useState } from 'react';
 import { useCategories } from '../../hooks/useCategories';
 import { PopoverElement } from '../ui/popover/PopoverElement';
-import formatter from '../../utils/formatting/formatting';
 import { getData } from '../../class/serverBridge';
 import { RenderTag } from '../RenderTag';
-import { obj } from '../../utils/formatting/ObjectFormat';
-import { useDispatch } from 'react-redux';
 import { TagInputProvider } from '../../context/TagInputContext';
-import { addItem, newTagInputItem, selectTagByName } from '../inputs/TagInput/TagInputSlice';
-import { useSelect } from '../../hooks/useSelect';
 import { Category } from 'shared';
 
-type SelectedCategories = Category & { isSelected: boolean };
+export type SelectedCategories = Category & { isSelected: boolean };
 
 type SelectCategoryProps = {
 	baseCategories: Category[];
@@ -35,32 +30,20 @@ export const SelectCategory = ({
 	...props
 }: SelectCategoryProps) => {
 	const [results, setResults] = useState([]);
-	const catContext = useCategories();
-
-	const dispatch = useDispatch();
-	const items = useSelect(selectTagByName, name);
 
 	const newItem = useCallback(
 		(category: Category) => {
-			const ids = obj.getUniques(items, 'id');
-			// setStackCats([category]);
-			if (!ids.includes(category.id)) {
-				dispatch(
-					addItem(
-						newTagInputItem({
-							...category,
-							isSelected: true,
-							name: name,
-							//@ts-ignore
-							text: category.name,
-						})
-					)
-				);
-			}
+			//TODO: handle new category creation to add the
+
+			setPopularCategories((prev) => ({
+				...prev,
+				[category.id]: {
+					...category,
+					isSelected: true,
+				} as SelectedCategories,
+			}));
 		},
 		[
-			items,
-			dispatch,
 			name,
 			// setStackCats
 		]
@@ -95,6 +78,7 @@ export const SelectCategory = ({
 								cat.isSelected = false;
 							}
 
+							//@ts-expect-error idk
 							setResults(data);
 						}
 					}}
@@ -111,7 +95,6 @@ export const SelectCategory = ({
 					headerElement={<Heading size={'md'}>Categories</Heading>}>
 					<Box>
 						{Object.values(popularCategories)?.map((category, ind) => {
-							console.log(popularCategories);
 							return (
 								<RenderTag
 									m={1}
@@ -142,16 +125,6 @@ export const SelectCategory = ({
 									key={'stack cat' + category.id}
 									onClick={() => {
 										setPopularCategories({ [category.id]: category });
-										dispatch(
-											addItem(
-												newTagInputItem({
-													...category,
-													isSelected: true,
-													name: name,
-													text: category.name,
-												})
-											)
-										);
 									}}
 									text={category.name}
 									color={category.color}

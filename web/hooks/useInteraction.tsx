@@ -5,7 +5,7 @@ const { getData } = require('../class/serverBridge');
 
 type InteractionsContextType = {
 	GetPostInteraction: (postId: number) => Promise<PostInteraction>;
-
+	GetPostInteractionOfUser: (postId: number, userId: number) => Promise<PostInteraction>;
 	AddLike: (postId: number, userId: number) => Promise<void>;
 };
 
@@ -20,6 +20,20 @@ export const InteractionsProvider = ({ children }: { children: React.ReactNode }
 		}
 
 		const interaction = await getData.get(`/posts/${postId}/interactions`);
+
+		if (interaction) {
+			interactions.update({ [postId]: interaction });
+			return interaction;
+		}
+
+		return interaction;
+	}
+	async function GetPostInteractionOfUser(postId: number, userId: number): Promise<PostInteraction> {
+		if (postId in interactions.value) {
+			return interactions.value[postId];
+		}
+
+		const interaction = await getData.get(`/posts/${postId}/interactions/?userId=${userId}`);
 
 		if (interaction) {
 			interactions.update({ [postId]: interaction });
@@ -43,6 +57,7 @@ export const InteractionsProvider = ({ children }: { children: React.ReactNode }
 		<InteractionsContext.Provider
 			value={{
 				AddLike,
+				GetPostInteractionOfUser,
 				GetPostInteraction,
 			}}>
 			{children}

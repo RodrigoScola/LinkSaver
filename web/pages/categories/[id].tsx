@@ -9,7 +9,8 @@ import formatter from '../../utils/formatting/formatting';
 import { RenderHead } from '../../Components/RenderHead';
 import { useEffect } from 'react';
 import { newPost } from '../../utils/formatting/utils';
-import { Category, Post } from 'shared';
+import { Category, Post, PostCategories } from 'shared';
+import { AsyncQueue } from '../../class/AsyncQueue';
 
 // TODO: ADD FOLDER ID AND FILTER POSTS TO ONLY SHOW WITH THE SAME ID
 // TODO: change from static paths and props to server side props
@@ -60,13 +61,27 @@ export default function CategoryID({ category, posts: basePosts }: { category: C
 	);
 }
 
+//@ts-expect-error idk what params, will prob have to move this to server side props anyway
 export const getStaticProps = async ({ params }) => {
 	const id = params.id;
-	let category = await getData.getPost('categories', id);
-	const posts = await getData.get('categories/' + id + '/posts');
-	if (!id || !category) {
-		category = { cat_name: 'default category name', cat_color: '#000000' };
+
+	const queue = new AsyncQueue();
+
+	queue.Add('categories', getData.get(`categories/${id}`))
+		.Add('post_categories', getData.get(`/postCategories/?category_id=${id}`))
+		.Build();
+
+	let category = queue.Get('categories');
+	let postCategories = queue.GetResult('post_categories');
+
+	const urlParams = new URLSearchParams();
+
+	for (const postCategory of postCategories as PostCategories[]) {
+		urlParams.append('id', postCategory.post_id.toString());
 	}
+
+	const posts = await getData.get(`posts?${urlParams.toString()}`);
+
 	return {
 		props: {
 			category: category,

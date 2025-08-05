@@ -22,7 +22,7 @@ type NewFolderCardProps = {
 
 export const NewFolderCard = ({
 	folder,
-	onParentFolderChange,
+	onParentFolderChange = () => {},
 	folders,
 	onChange: handleChange = () => {},
 	onSubmit: onSubmit,
@@ -75,7 +75,7 @@ export const NewFolderCard = ({
 						Parent Folder
 					</Heading>
 					<FolderListInput folders={folders} onFolderChange={onParentFolderChange} />
-					<SearchInput type='folders' onResult={handleResult} />
+					<SearchInput name={'folderSearchResult'} type='folders' onResult={handleResult} />
 				</Flex>
 				<Flex justifyContent={'center'} m={'auto'} pt={2} mb={4}>
 					<RenderTag color={folder?.color} size='lg'>

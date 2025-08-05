@@ -56,7 +56,7 @@ export const PostsProvider = ({ children }: { children: any }) => {
 	// async function GetCategories(id: number) {
 	// 	return id in postCategories
 	// 		? Promise.resolve(postCategories[id])
-	// 		: getData.get(`/posts/${id}/categories`);
+	// 		: getData.get(`/postCategories/?post_id=${id}`);
 	// }
 
 	return (

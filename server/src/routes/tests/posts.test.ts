@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { App, dbconnection } from '../../__tests__/vitest.setup';
+import { ContextBuilder } from 'src/queryFilter/ContextBuilder';
 
 describe('teste de rotas de posts', () => {
 	it('pega todas as posts', async () => {

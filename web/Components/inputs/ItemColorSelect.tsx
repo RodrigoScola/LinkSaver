@@ -1,4 +1,4 @@
-import { Box, BoxProps, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { FormInput } from './FormInput';
 import { ColorInput } from './ColorInput';
 

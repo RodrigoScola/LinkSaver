@@ -10,7 +10,7 @@ type IPostCategory = {
 
 const PostCategoryContext = createContext<IPostCategory | null>(null);
 
-export const PostCategoryProvider = ({ children }) => {
+export const PostCategoryProvider = ({ children }: { children: React.ReactNode }) => {
 	const [postCategories, setPostCategories] = useState<Record<number, PostCategories[]>>({});
 
 	async function GetPostCategories(postId: number): Promise<PostCategories[]> {
@@ -18,7 +18,7 @@ export const PostCategoryProvider = ({ children }) => {
 			return postCategories[postId];
 		}
 
-		const cats = (await getData.get(`/posts/${postId}/categories`)) || [];
+		const cats = (await getData.get(`/postCategories/?post_id=${postId}`)) || [];
 
 		setPostCategories((curr) => ({ ...curr, [postId]: cats || [] }));
 
