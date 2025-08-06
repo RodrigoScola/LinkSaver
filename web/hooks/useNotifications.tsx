@@ -42,7 +42,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 		try {
 			const latest = Object.values(notifications.value)[Object.keys(notifications.value).length - 1];
 
-			// console.log(timers)
 			if (latest.id) {
 				if (!toast.isActive(latest.id)) {
 					toast({ position: 'top', ...latest });

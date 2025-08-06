@@ -9,8 +9,8 @@ type PostPreview = {
 
 type IPostContext = {
 	post: Post;
-	update: (post: Post) => void;
-	isCreator: boolean;
+	save: (post: Post) => void;
+	isCreator: (userId: number) => boolean;
 	preview: PostPreview;
 };
 
@@ -31,9 +31,11 @@ export const PostProvider = ({ post, children }: { post: Post; children: any }) 
 	return (
 		<PostContext.Provider
 			value={{
-				isCreator: true,
+				isCreator: (userId: number) => {
+					return Number(post.userId) == Number(userId);
+				},
 				post: post,
-				update,
+				save: update,
 				preview: preview.value,
 			}}>
 			{children}

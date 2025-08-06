@@ -1,46 +1,21 @@
 import { createContext, useContext } from 'react';
-import { NewInteraction, PostInteraction } from 'shared';
+import { Interaction, NewInteraction } from 'shared';
 import { useObject } from './useObject';
 const { getData } = require('../class/serverBridge');
 
 type InteractionsContextType = {
-	GetPostInteraction: (postId: number) => Promise<PostInteraction>;
-	GetPostInteractionOfUser: (postId: number, userId: number) => Promise<PostInteraction>;
+	GetPostInteractionOfUser: (postId: number, userId: number) => Promise<Interaction | null>;
 	AddLike: (postId: number, userId: number) => Promise<void>;
+	RemoveLike: (interactionId: number) => Promise<void>;
 };
 
 const InteractionsContext = createContext<InteractionsContextType | null>(null);
 
 export const InteractionsProvider = ({ children }: { children: React.ReactNode }) => {
-	const interactions = useObject<Record<number, PostInteraction>>();
+	async function GetPostInteractionOfUser(postId: number, userId: number): Promise<Interaction> {
+		const interaction = await getData.get(`/interactions/?postId=${postId}&userId=${userId}`);
 
-	async function GetPostInteraction(postId: number): Promise<PostInteraction> {
-		if (postId in interactions.value) {
-			return interactions.value[postId];
-		}
-
-		const interaction = await getData.get(`/posts/${postId}/interactions`);
-
-		if (interaction) {
-			interactions.update({ [postId]: interaction });
-			return interaction;
-		}
-
-		return interaction;
-	}
-	async function GetPostInteractionOfUser(postId: number, userId: number): Promise<PostInteraction> {
-		if (postId in interactions.value) {
-			return interactions.value[postId];
-		}
-
-		const interaction = await getData.get(`/posts/${postId}/interactions/?userId=${userId}`);
-
-		if (interaction) {
-			interactions.update({ [postId]: interaction });
-			return interaction;
-		}
-
-		return interaction;
+		return interaction.find(Boolean) || null;
 	}
 
 	async function AddLike(postId: number, userId: number) {
@@ -53,12 +28,20 @@ export const InteractionsProvider = ({ children }: { children: React.ReactNode }
 		} as NewInteraction);
 		//TODO: update the interactions
 	}
+
+	async function RemoveLike(interactionId: number) {
+		if (!interactionId) {
+			console.error('invalid interactionId');
+			return;
+		}
+		await getData.delete(`interactions/${interactionId}`);
+	}
 	return (
 		<InteractionsContext.Provider
 			value={{
+				RemoveLike,
 				AddLike,
 				GetPostInteractionOfUser,
-				GetPostInteraction,
 			}}>
 			{children}
 		</InteractionsContext.Provider>

@@ -3,11 +3,11 @@ import { Folder } from 'shared';
 
 type IfolderContext = {
 	folder: Folder;
-	isCreator: boolean;
+	isCreator: (userId: number) => boolean;
 	parent_folder?: Folder;
 };
 
-export const FolderContext = createContext<IfolderContext>({ isCreator: false, folder: {} as Folder });
+export const FolderContext = createContext<IfolderContext>({ isCreator: () => false, folder: {} as Folder });
 
 export const FolderProvider = ({ baseFolder, children }: { baseFolder: Folder; children: React.ReactNode }) => {
 	useEffect(() => {}, []);
@@ -16,7 +16,7 @@ export const FolderProvider = ({ baseFolder, children }: { baseFolder: Folder; c
 		<FolderContext.Provider
 			value={{
 				//TODO: FIX THIS
-				isCreator: true,
+				isCreator: (userId: number) => baseFolder.userId === userId,
 				folder: baseFolder,
 			}}>
 			{children}

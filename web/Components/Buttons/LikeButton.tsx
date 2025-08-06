@@ -10,28 +10,39 @@ import { useQuery } from '@tanstack/react-query';
 export const LikeButton = ({ isDisabled = true, testing = false, ...props }) => {
 	const post = usePost();
 
-	//TODO: ADD USER HERE
-	const [userId, setUserId] = useState<number>(-1);
-
 	const user = useUsers();
 
 	const interactions = useInteraction();
 
 	const nlike = async () => {
-		//TODO: ADD USER ID HERE
-		await interactions.AddLike(post.post.id, -1);
+		if (post.post.id == -1) {
+			console.error('invalid post id');
+			return;
+		}
+
+		const hasInteraction = await interactions.GetPostInteractionOfUser(post.post.id, user.user.id);
+
+		if (hasInteraction) {
+			await interactions.RemoveLike(hasInteraction.id);
+
+			userPostInteractionFetcher.refetch();
+			return;
+		}
+
+		await interactions.AddLike(post.post.id, user.user.id);
+
+		userPostInteractionFetcher.refetch();
 	};
 
 	const userPostInteractionFetcher = useQuery({
-		queryKey: ['userPostInteraction', post.post.id, userId],
-		queryFn: () => interactions.GetPostInteractionOfUser(post.post.id, userId),
+		queryKey: ['userPostInteraction', post.post.id, user.user.id],
+		queryFn: () => interactions.GetPostInteractionOfUser(post.post.id, user.user.id),
 		refetchOnWindowFocus: false,
-		initialData: {
-			like: 0,
-		},
+		throwOnError: false,
+		enabled: !!post.post.id && user.loggedIn,
 	});
 
-	if (userPostInteractionFetcher.data?.like > 0) {
+	if (userPostInteractionFetcher.data) {
 		return (
 			<Tooltip label={testing && 'you need to be logged in to use me'}>
 				<IconButton

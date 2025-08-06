@@ -65,18 +65,19 @@ export const SelectCategory = ({
 			<TagInputProvider name={name} defaultSelected={defaultSelected}>
 				<PopoverElement
 					onOpen={async () => {
-						if (Object.values(popularCategories).length == 0) {
+						console.log('pop', popularCategories);
+						if (Object.values(results).length == 0) {
 							const data = (await getData.get(`/categories/?limit=5`)) as Category &
 								{ isSelected?: boolean }[];
-
-							let obj: Record<number, SelectedCategories> = {};
 
 							console.log('this is the data', data);
 
 							for (const cat of data) {
 								if (!cat) continue;
-								cat.isSelected = false;
+								cat.isSelected = true;
 							}
+
+							console.log('data', data);
 
 							//@ts-expect-error idk
 							setResults(data);
@@ -94,27 +95,10 @@ export const SelectCategory = ({
 					}
 					headerElement={<Heading size={'md'}>Categories</Heading>}>
 					<Box>
-						{Object.values(popularCategories)?.map((category, ind) => {
-							return (
-								<RenderTag
-									m={1}
-									key={'stack cat' + category.id}
-									onClick={() => {
-										setPopularCategories([{ ...category, isSelected: true }]);
-									}}
-									text={category.name}
-									color={category.color}
-								/>
-							);
-						})}
-					</Box>
-					<Box>
 						<SearchInput
 							type={'categories'}
 							name={'categorySearch'}
 							onResult={(res) => {
-								console.log(`setting the result on input`);
-								console.log(res);
 								setResults(res);
 							}}
 						/>
@@ -124,7 +108,20 @@ export const SelectCategory = ({
 									m={1}
 									key={'stack cat' + category.id}
 									onClick={() => {
-										setPopularCategories({ [category.id]: category });
+										const obj = {
+											...popularCategories,
+											[category.id]: {
+												...category,
+												isSelected:
+													!popularCategories[category.id]?.isSelected,
+											},
+										};
+										setPopularCategories(obj);
+										console.log('obj', obj);
+
+										onCategoryChange(
+											Object.values(obj).filter((f) => f.isSelected)
+										);
 									}}
 									text={category.name}
 									color={category.color}

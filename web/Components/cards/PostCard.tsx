@@ -33,18 +33,50 @@ import { useQuery } from '@tanstack/react-query';
 import { useUsers } from '../../hooks/useUser';
 
 export const PostCard = () => {
-	const { post, isCreator, update: updatePost } = usePost();
+	const { post, isCreator, save } = usePost();
 
 	const catContext = useCategories();
 
-	const postCategories = usePostCategory();
+	const postCategoriesCtx = usePostCategory();
 
 	const [currPost, setCurrPost] = useState(post);
 	const closeElement = () => {};
 
+	const [currentCategories, setCurrentCategories] = useState<Record<number, Category>>({});
+
+	const [postCategories, setPostCategories] = useState<PostCategories[]>([]);
+
 	const onCategoryChange = useCallback(
-		(categories: Category[]) => {
-			//TODO: handle category change
+		async (categories: Category[]) => {
+			const invalidCategoryIds = Object.values(postCategories).filter(
+				(cat) => !categories.some((c) => c.id === cat.category_id)
+			);
+
+			const newCategories = categories.filter((cat) => !(cat.id in currentCategories));
+
+			console.log('categories', categories);
+
+			console.log('invalidCategoryIds', invalidCategoryIds, 'new ', newCategories, categories);
+
+			await Promise.all(
+				invalidCategoryIds.map((postCategory) => postCategoriesCtx.RemovePostCategory(postCategory))
+			);
+
+			const createdPostCategories = (
+				await Promise.all(
+					newCategories.map((category) =>
+						postCategoriesCtx.CreatePostCategory({
+							category_id: category.id,
+							post_id: post.id,
+							status: 'public',
+							userId: user.user.id,
+						})
+					)
+				)
+			).filter(Boolean);
+			// setPostCategories(createdPostCategories);
+
+			console.log(createdPostCategories, ' the created');
 		},
 		[catContext]
 	);
@@ -59,17 +91,17 @@ export const PostCard = () => {
 		[setCurrPost]
 	);
 
-	const [pcategories, setPostCategories] = useState<Record<number, Category>>({});
-
 	useEffect(() => {
 		async function go() {
 			try {
 				let pcat: PostCategories[] = [];
 				try {
-					pcat = await postCategories.GetPostCategories(post.id);
+					pcat = await postCategoriesCtx.GetPostCategories(post.id);
 				} catch (err) {
 					console.error(err);
 				}
+
+				setPostCategories(pcat);
 
 				const cats = (
 					await Promise.allSettled(
@@ -80,7 +112,7 @@ export const PostCard = () => {
 					.map((promise) => promise.value)
 					.filter(Boolean);
 
-				setPostCategories(ObjectFormat.toObj(cats.filter(Boolean) as Category[], 'id'));
+				setCurrentCategories(ObjectFormat.toObj(cats.filter(Boolean) as Category[], 'id'));
 
 				for (const category of cats) {
 					if (!category) {
@@ -96,10 +128,11 @@ export const PostCard = () => {
 		go();
 	}, [post.id]);
 
-	const updatePo = () => {
+	const updatePo = async () => {
 		//TODO: server side post
 
-		alert('todo: server side post');
+		await save(currPost);
+
 		// dispatch(serverSavePost(currPost));
 	};
 
@@ -124,13 +157,13 @@ export const PostCard = () => {
 				</Flex>
 			</Box>
 			<Box py={0}>
-				<RenderCategories categories={Object.values(pcategories)} />
+				<RenderCategories categories={Object.values(currentCategories)} />
 				<Divider borderWidth={'2px'} mt={3} />
 			</Box>
 			<Box display={'flex'} justifyContent={'right'}>
 				<ButtonGroup>
 					<LikeButton size={'sm'} />
-					{isCreator ? (
+					{isCreator(user.user.id) ? (
 						<>
 							<ModalComponent
 								// color={'purple'}
@@ -154,7 +187,7 @@ export const PostCard = () => {
 								}
 								headerText={'Edit post'}>
 								<EditPostCard
-									categories={Object.values(pcategories)}
+									categories={Object.values(currentCategories)}
 									post={post}
 									onChange={onChange}
 									onCategoryChange={onCategoryChange}
@@ -162,7 +195,7 @@ export const PostCard = () => {
 
 								<SelectFolder
 									baseFolders={foldersFetcher.data}
-									onChange={(f) => updatePost({ ...post, parent: f.id })}
+									onChange={(f) => save({ ...post, parent: f.id })}
 									defaultSelected={
 										foldersFetcher.data?.find(
 											(folder: Folder) => folder.id === post.parent

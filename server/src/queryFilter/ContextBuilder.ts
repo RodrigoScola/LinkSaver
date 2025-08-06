@@ -72,12 +72,8 @@ class QueryBuilderFactorySingleton {
 
 		return this;
 	}
-	Select<K extends object>(item: object, tableItem: K, final: ContextParameters<K>): this {
-		if (
-			!(ParameterActions.SELECT in item) ||
-			typeof item.select !== 'string' ||
-			!(item.select in tableItem)
-		) {
+	Select<K extends object>(item: object, final: ContextParameters<K>): this {
+		if (!(ParameterActions.SELECT in item) || typeof item.select !== 'string') {
 			return this;
 		}
 		const selected = item.select.split(',').filter((item) => item);
@@ -134,13 +130,13 @@ class QueryBuilderFactorySingleton {
 	WhereIn<Obj extends object, Key extends keyof Obj, Value extends Obj[Key]>(
 		key: Key,
 		value: Value | Value[],
-		tableItem: Obj,
-		final: ContextParameters<Obj>
+		final: ContextParameters<Obj>,
+		tableItem?: Obj
 	): this {
 		if (!Array.isArray(value)) {
 			return this;
 		}
-		if (typeof tableItem[key] === 'number') {
+		if (tableItem && typeof tableItem[key] === 'number') {
 			value = value.map((item) => Number(item)) as Value[];
 		}
 		final.whereIn = {
@@ -196,7 +192,7 @@ class QueryBuilderFactorySingleton {
 		if (!tableItem) return final;
 
 		this.Search(item as SearchAction<T>, tableItem, final, props)
-			.Select(item, tableItem, final)
+			.Select(item, final)
 			.Order(item, final);
 
 		Object.entries(item).forEach(([key, value]) => {
@@ -204,7 +200,7 @@ class QueryBuilderFactorySingleton {
 				return;
 			}
 			if (!final.whereIn && Array.isArray(value)) {
-				this.WhereIn(key, value, tableItem, final);
+				this.WhereIn(key, value, final, tableItem);
 				return;
 			}
 

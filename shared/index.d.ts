@@ -81,6 +81,8 @@ export type PostCategories = {
 	id: number;
 	category_id: number;
 	post_id: number;
+	userId: number;
+	status: 'public' | 'private';
 };
 export type NewPost = OmitBy<Post, 'id'>;
 // Ensure this file is a module

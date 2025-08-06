@@ -62,8 +62,6 @@ if (process.env.NODE_ENV !== 'test') {
 		// 	.insert({ color: '#00AA00', name: 'newCatl', status: 'public', userId: -1 } as Category)
 		// 	.catch(console.error);
 
-		getTable('categories').then(console.log);
-
 		console.log('Server is listening in http://localhost:' + process.env.PORT);
 	});
 }

@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Flex, FlexProps } from '@chakra-ui/react';
 import { RenderTag } from '../../RenderTag';
 
@@ -24,7 +24,7 @@ export const TagInput = ({
 	onItemChange = () => {},
 	...props
 }: TagInputProps) => {
-	const selectedItems = useMemo(() => allTags.filter((item) => item.isSelected), [allTags]);
+	const [rendrCount, setRenderCount] = useState(0);
 
 	const changeItem = useCallback(
 		(id: number) => {
@@ -35,17 +35,20 @@ export const TagInput = ({
 				return;
 			}
 			//TODO: check if theres a bug when selecting this
+			console.log('bfore', item);
 
 			item.isSelected = !item.isSelected;
 
+			console.log('after', item);
+
 			onItemChange?.(item);
+
+			onSelectChange?.(allTags.filter((f) => f.isSelected));
+
+			setRenderCount((prev) => prev + 1);
 		},
 		[onItemChange, allTags]
 	);
-
-	useEffect(() => {
-		onSelectChange(selectedItems);
-	}, [selectedItems, onSelectChange]);
 
 	return (
 		<Flex justifyContent={'center'} gap={3} {...props} wrap={'wrap'}>
@@ -55,8 +58,8 @@ export const TagInput = ({
 						size={'md'}
 						m={1}
 						shadow={item?.isSelected ? 'inset 2px -2px' : 'inset -2px 2px'}
-						colorScheme={'blue'}
-						variant={'outline'}
+						colorScheme={item?.isSelected ? item.color : 'blue'}
+						variant={item?.isSelected ? 'solid' : 'outline'}
 						key={idx + 'tagItemInput + name' + name}
 						onClick={() => {
 							changeItem(item.id);

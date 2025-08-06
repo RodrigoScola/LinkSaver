@@ -35,7 +35,7 @@ export class AsyncQueue {
 	}
 
 	//not recommended but sometimes can be nice
-	public GetResult(key: string): unknown {
+	public GetResult<T>(key: string): T | unknown {
 		if (!(key in this.results)) {
 			return;
 		}
@@ -44,7 +44,7 @@ export class AsyncQueue {
 	}
 
 	public Get(key: string): PromiseSettledResult<unknown> {
-		if (!key) {
+		if (!key || !(key in this.results)) {
 			return {
 				status: 'rejected',
 				reason: 'key was never here',

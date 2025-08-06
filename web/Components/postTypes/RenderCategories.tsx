@@ -1,19 +1,25 @@
 import { Flex, FlexProps } from '@chakra-ui/react';
-import { useEffect, useMemo, useState } from 'react';
-import { isDifferent } from '../../utils/formatting/utils';
+import { useMemo, useState } from 'react';
 
 import { Category } from 'shared';
 import { RenderTag } from '../RenderTag';
 
 type RenderCategoriesProps = {
 	categories: Category[];
+
+	onCategoryClick?: (category: Category) => void;
 } & FlexProps;
 
-export const RenderCategories = ({ categories, ...rest }: RenderCategoriesProps) => {
+export const RenderCategories = ({ categories, onCategoryClick = () => {}, ...rest }: RenderCategoriesProps) => {
 	const renderedTags = useMemo(
 		() =>
 			categories?.map((category: Category, idx: number) => (
-				<RenderTag key={idx} color={category?.color} text={category?.name} />
+				<RenderTag
+					onClick={() => onCategoryClick(category)}
+					key={idx}
+					color={category?.color}
+					text={category.name}
+				/>
 			)),
 		[categories]
 	);

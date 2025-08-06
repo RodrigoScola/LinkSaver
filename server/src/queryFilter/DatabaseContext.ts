@@ -1,6 +1,7 @@
 import { AvailableContextItems, ContextInstance, DatabaseQuery, SEARCH_MODE, TableNames } from './types';
 import { ContextBuilder } from './ContextBuilder';
 import { ItemContextMaker } from './contextItems/ItemContext';
+import { Category, Category, Folder, Interaction, Post, PostCategories, User } from 'shared';
 
 export function GetSearchModeMessage(mode: SEARCH_MODE) {
 	switch (mode) {
@@ -63,28 +64,33 @@ ContextFactory.AddItem(
 		)
 );
 
+function OnlyPublic<T extends TableNames>(q: DatabaseQuery<T>): DatabaseQuery<T> {
+	return q.where('status', 'public');
+}
+
 ContextFactory.AddItem(
 	'posts',
-	(q: DatabaseQuery<'posts'>): ContextInstance<'posts'> => new ItemContextMaker<Post, 'posts'>(q)
+	(q: DatabaseQuery<'posts'>): ContextInstance<'posts'> => new ItemContextMaker<Post, 'posts'>(OnlyPublic(q))
 );
 
 ContextFactory.AddItem(
 	'folders',
-	(q: DatabaseQuery<'folders'>): ContextInstance<'folders'> => new ItemContextMaker<Folder, 'folders'>(q)
+	(q: DatabaseQuery<'folders'>): ContextInstance<'folders'> =>
+		new ItemContextMaker<Folder, 'folders'>(OnlyPublic(q))
 );
 
 ContextFactory.AddItem(
 	'users',
-	(q: DatabaseQuery<'users'>): ContextInstance<'users'> => new ItemContextMaker<User, 'users'>(q)
+	(q: DatabaseQuery<'users'>): ContextInstance<'users'> => new ItemContextMaker<User, 'users'>(OnlyPublic(q))
 );
 ContextFactory.AddItem(
 	'post_categories',
 	(q: DatabaseQuery<'post_categories'>): ContextInstance<'post_categories'> =>
-		new ItemContextMaker<PostCategories, 'post_categories'>(q)
+		new ItemContextMaker<PostCategories, 'post_categories'>(OnlyPublic(q))
 );
 
 ContextFactory.AddItem(
 	'interactions',
 	(q: DatabaseQuery<'interactions'>): ContextInstance<'interactions'> =>
-		new ItemContextMaker<Interaction, 'interactions'>(q)
+		new ItemContextMaker<Interaction, 'interactions'>(OnlyPublic(q))
 );
