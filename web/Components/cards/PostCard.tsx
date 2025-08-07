@@ -1,17 +1,6 @@
-import { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
+import { ChangeEvent, useCallback, useEffect } from 'react';
 import { usePost } from '../../context/PostContext';
-import {
-	Box,
-	Button,
-	ButtonGroup,
-	Container,
-	Divider,
-	Flex,
-	Heading,
-	Img,
-	Link,
-	Skeleton,
-} from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Divider, Flex, Heading, Link, Skeleton, Tag } from '@chakra-ui/react';
 import { LikeButton } from '../Buttons/LikeButton';
 import { ModalComponent } from '../ui/modals/ModalComponent';
 import { RenderCategories } from '../postTypes/RenderCategories';
@@ -23,14 +12,14 @@ import { VscEdit, VscSave, VscTrash } from 'react-icons/vsc';
 import formatter from '../../utils/formatting/formatting';
 import { BoxCard } from './BoxCard';
 import { usePostCategory } from '../../hooks/usePostCategories';
-import e from 'express';
 import { Category, Folder, PostCategories } from 'shared';
 import { ObjectFormat } from '../../utils/formatting/ObjectFormat';
-import folders from '../../pages/folders';
 import { SelectFolder } from './SelectFolder';
 import { getData } from '../../class/serverBridge';
 import { useQuery } from '@tanstack/react-query';
 import { useUsers } from '../../hooks/useUser';
+import { SelectedCategories } from './SelectCategory';
+import { AsyncQueue } from '../../class/AsyncQueue';
 
 export const PostCard = () => {
 	const { post, isCreator, save } = usePost();
@@ -40,43 +29,55 @@ export const PostCard = () => {
 	const postCategoriesCtx = usePostCategory();
 
 	const [currPost, setCurrPost] = useState(post);
-	const closeElement = () => {};
+
+	const noop = () => {};
 
 	const [currentCategories, setCurrentCategories] = useState<Record<number, Category>>({});
 
 	const [postCategories, setPostCategories] = useState<PostCategories[]>([]);
 
 	const onCategoryChange = useCallback(
-		async (categories: Category[]) => {
-			const invalidCategoryIds = Object.values(postCategories).filter(
-				(cat) => !categories.some((c) => c.id === cat.category_id)
+		async (categories: SelectedCategories[]) => {
+			const removedCategories: SelectedCategories[] = [];
+
+			const newCategories: SelectedCategories[] = [];
+
+			for (const category of categories) {
+				if (category.id in currentCategories && !category.isSelected) {
+					removedCategories.push(category);
+				} else if (!(category.id in currentCategories) && category.isSelected) {
+					newCategories.push(category);
+				}
+			}
+
+			const queue = new AsyncQueue();
+
+			const removedPostCategories = postCategories.filter((pc) =>
+				removedCategories.find((rc) => rc.id === pc.category_id)
 			);
 
-			const newCategories = categories.filter((cat) => !(cat.id in currentCategories));
-
-			console.log('categories', categories);
-
-			console.log('invalidCategoryIds', invalidCategoryIds, 'new ', newCategories, categories);
-
-			await Promise.all(
-				invalidCategoryIds.map((postCategory) => postCategoriesCtx.RemovePostCategory(postCategory))
-			);
-
-			const createdPostCategories = (
-				await Promise.all(
-					newCategories.map((category) =>
-						postCategoriesCtx.CreatePostCategory({
-							category_id: category.id,
-							post_id: post.id,
-							status: 'public',
-							userId: user.user.id,
-						})
+			queue.Add(
+				'removed_categories',
+				Promise.allSettled(
+					removedPostCategories.map((pc) => postCategoriesCtx.RemovePostCategory(pc))
+				)
+			)
+				.Add(
+					'added_categories',
+					Promise.allSettled(
+						newCategories.map((nc) =>
+							postCategoriesCtx.CreatePostCategory({
+								post_id: post.id,
+								userId: user.user.id,
+								status: 'public',
+								category_id: nc.id,
+							})
+						)
 					)
 				)
-			).filter(Boolean);
-			// setPostCategories(createdPostCategories);
+				.Build();
 
-			console.log(createdPostCategories, ' the created');
+			await fetchCategories();
 		},
 		[catContext]
 	);
@@ -91,41 +92,42 @@ export const PostCard = () => {
 		[setCurrPost]
 	);
 
-	useEffect(() => {
-		async function go() {
+	const fetchCategories = useCallback(async () => {
+		try {
+			let pcat: PostCategories[] = [];
 			try {
-				let pcat: PostCategories[] = [];
-				try {
-					pcat = await postCategoriesCtx.GetPostCategories(post.id);
-				} catch (err) {
-					console.error(err);
-				}
-
-				setPostCategories(pcat);
-
-				const cats = (
-					await Promise.allSettled(
-						pcat.map((postCategory) => catContext.GetCategory(postCategory.category_id))
-					)
-				)
-					.filter((promise) => promise.status === 'fulfilled')
-					.map((promise) => promise.value)
-					.filter(Boolean);
-
-				setCurrentCategories(ObjectFormat.toObj(cats.filter(Boolean) as Category[], 'id'));
-
-				for (const category of cats) {
-					if (!category) {
-						continue;
-					}
-
-					catContext.AddCategory(category);
-				}
+				pcat = await postCategoriesCtx.GetPostCategories(post.id);
 			} catch (err) {
-				console.log(`this is post id error`, err);
+				console.error(err);
 			}
+
+			setPostCategories(pcat);
+
+			const cats = (
+				await Promise.allSettled(
+					pcat.map((postCategory) => catContext.GetCategory(postCategory.category_id))
+				)
+			)
+				.filter((promise) => promise.status === 'fulfilled')
+				.map((promise) => promise.value)
+				.filter(Boolean);
+
+			setCurrentCategories(ObjectFormat.toObj(cats.filter(Boolean) as Category[], 'id'));
+
+			for (const category of cats) {
+				if (!category) {
+					continue;
+				}
+
+				catContext.AddCategory(category);
+			}
+		} catch (err) {
+			console.error(`could not fetch post categories`, err);
 		}
-		go();
+	}, []);
+
+	useEffect(() => {
+		fetchCategories();
 	}, [post.id]);
 
 	const updatePo = async () => {
@@ -145,6 +147,17 @@ export const PostCard = () => {
 		initialData: [],
 	});
 
+	const currentFolder = useQuery({
+		queryKey: ['folder', post.parent],
+		queryFn: () => getData.get(`/folders/${post.parent}`).then((res) => res || {}),
+		refetchOnWindowFocus: false,
+		enabled: Boolean(post.parent),
+		initialData: {},
+		placeholderData: {},
+	});
+
+	console.log({ currentFolder: currentFolder.data, parent: post.parent });
+
 	return (
 		<BoxCard height={'fit-content'} minW={'200px'} w={'30%'} p={3} maxW={'400px'}>
 			<Box pb={2}>
@@ -156,10 +169,16 @@ export const PostCard = () => {
 					</Link>
 				</Flex>
 			</Box>
-			<Box py={0}>
+			<Box mb={3} py={0}>
 				<RenderCategories categories={Object.values(currentCategories)} />
-				<Divider borderWidth={'2px'} mt={3} />
 			</Box>
+
+			{currentFolder.data?.title && (
+				<Tag mb={2} color={currentFolder.data.color}>
+					{currentFolder.data.title}
+				</Tag>
+			)}
+			<Divider borderWidth={'1px'} mt={1} />
 			<Box display={'flex'} justifyContent={'right'}>
 				<ButtonGroup>
 					<LikeButton size={'sm'} />
@@ -167,7 +186,7 @@ export const PostCard = () => {
 						<>
 							<ModalComponent
 								// color={'purple'}
-								onClose={closeElement}
+								onClose={noop}
 								footerElement={
 									<Button
 										colorScheme={'yellow'}
@@ -193,6 +212,10 @@ export const PostCard = () => {
 									onCategoryChange={onCategoryChange}
 								/>
 
+								<Heading pb={3} size={'lg'}>
+									Folder
+								</Heading>
+
 								<SelectFolder
 									baseFolders={foldersFetcher.data}
 									onChange={(f) => save({ ...post, parent: f.id })}
@@ -205,8 +228,7 @@ export const PostCard = () => {
 							</ModalComponent>
 							<Skeleton borderRadius={'12px'} isLoaded={Boolean(post.title) || false}>
 								<ModalComponent
-									// color={'red'}
-									onClose={closeElement}
+									onClose={noop}
 									footerElement={<DeleteButton />}
 									triggerElement={
 										<Button

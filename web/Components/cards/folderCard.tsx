@@ -29,6 +29,10 @@ export const FolderCard = () => {
 	const [otherFolders, setOtherFolders] = useState<Folder[]>([]);
 
 	const updateFolder = useCallback(async () => {
+		if (!value.title || !value.color) {
+			return;
+		}
+
 		const updatedFolder = await fs.UpdateFolder(value);
 
 		if (!updatedFolder) {

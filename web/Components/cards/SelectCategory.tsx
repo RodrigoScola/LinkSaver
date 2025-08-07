@@ -16,7 +16,7 @@ export type SelectedCategories = Category & { isSelected: boolean };
 
 type SelectCategoryProps = {
 	baseCategories: Category[];
-	onCategoryChange: (cats: Category[]) => void;
+	onCategoryChange: (cats: SelectedCategories[]) => void;
 	name: string;
 	defaultSelected: boolean;
 } & FlexProps;
@@ -65,19 +65,14 @@ export const SelectCategory = ({
 			<TagInputProvider name={name} defaultSelected={defaultSelected}>
 				<PopoverElement
 					onOpen={async () => {
-						console.log('pop', popularCategories);
 						if (Object.values(results).length == 0) {
 							const data = (await getData.get(`/categories/?limit=5`)) as Category &
 								{ isSelected?: boolean }[];
-
-							console.log('this is the data', data);
 
 							for (const cat of data) {
 								if (!cat) continue;
 								cat.isSelected = true;
 							}
-
-							console.log('data', data);
 
 							//@ts-expect-error idk
 							setResults(data);
@@ -117,7 +112,6 @@ export const SelectCategory = ({
 											},
 										};
 										setPopularCategories(obj);
-										console.log('obj', obj);
 
 										onCategoryChange(
 											Object.values(obj).filter((f) => f.isSelected)

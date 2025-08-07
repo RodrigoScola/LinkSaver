@@ -1,6 +1,6 @@
-import { Box, Input } from '@chakra-ui/react';
+import { Box, Heading, Input } from '@chakra-ui/react';
 import { FormInput } from '../inputs/FormInput';
-import { SelectCategory } from './SelectCategory';
+import { SelectCategory, SelectedCategories } from './SelectCategory';
 import { Category, Post } from 'shared';
 import { ChangeEvent } from 'react';
 
@@ -12,11 +12,11 @@ export const EditPostCard = ({
 }: {
 	post: Post;
 	onChange(e?: ChangeEvent<HTMLInputElement>): void;
-	onCategoryChange: (e: Category[]) => void;
+	onCategoryChange: (e: SelectedCategories[]) => void;
 	categories: Category[];
 }) => {
 	return (
-		<Box>
+		<Box pb={3}>
 			<FormInput width={'full'} labelText={'post title'}>
 				<Input width={'full'} onChange={onChange} defaultValue={post.title} name='title' />
 			</FormInput>
@@ -28,6 +28,10 @@ export const EditPostCard = ({
 					name='post_url'
 				/>
 			</FormInput>
+
+			<Heading py={3} size={'lg'}>
+				Categories
+			</Heading>
 
 			<SelectCategory
 				onCategoryChange={onCategoryChange}

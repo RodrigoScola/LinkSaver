@@ -44,19 +44,12 @@ export const SelectFolder = ({ baseFolders, onChange = () => {}, defaultSelected
 
 	return (
 		<Box width={'100%'}>
-			<Heading size={'md'}>Recent</Heading>
-			{/* TODO: idk why its doing this */}
-			<FolderListInput
-				onFolderChange={onChange}
-				defaultSelected={selectedFolder}
-				width={'max-content'}
-				folders={folderResult}
-			/>
 			<SearchInput onResult={handleResults} type={'folders'} name={'folderSearchResult'} />
 			{folderResult.map((folder, index) => {
 				return (
 					<Button
 						onClick={() => {
+							onChange(folder);
 							setSelectedFolder(folder);
 						}}
 						key={'folderResult_' + index}>

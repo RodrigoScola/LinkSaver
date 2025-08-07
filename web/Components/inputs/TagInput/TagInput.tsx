@@ -34,16 +34,12 @@ export const TagInput = ({
 				console.error('Item not found with id:', id);
 				return;
 			}
-			//TODO: check if theres a bug when selecting this
-			console.log('bfore', item);
 
 			item.isSelected = !item.isSelected;
 
-			console.log('after', item);
-
 			onItemChange?.(item);
 
-			onSelectChange?.(allTags.filter((f) => f.isSelected));
+			onSelectChange?.(allTags);
 
 			setRenderCount((prev) => prev + 1);
 		},

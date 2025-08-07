@@ -53,6 +53,7 @@ export const NewFolderCard = ({
 							placeholder='Default Folder Name'
 							value={folder?.title}
 							maxLength={15}
+							minLength={1}
 							name='name'
 							onChange={onChange}
 							mt={1}
@@ -74,13 +75,9 @@ export const NewFolderCard = ({
 					<Heading pb={1} size={'sm'}>
 						Parent Folder
 					</Heading>
+
 					<FolderListInput folders={folders} onFolderChange={onParentFolderChange} />
 					<SearchInput name={'folderSearchResult'} type='folders' onResult={handleResult} />
-				</Flex>
-				<Flex justifyContent={'center'} m={'auto'} pt={2} mb={4}>
-					<RenderTag color={folder?.color} size='lg'>
-						{folder?.title}
-					</RenderTag>
 				</Flex>
 
 				<Flex mb={2} justifyContent={'center'}>
@@ -89,7 +86,7 @@ export const NewFolderCard = ({
 						onClick={onSubmit}
 						leftIcon={<VscNewFolder />}
 						colorScheme={'whatsapp'}>
-						{type == 'update' ? 'update folder' : 'add new folder'}
+						{type == 'update' ? 'update folder' : 'Create New Folder'}
 					</Button>
 				</Flex>
 			</Box>

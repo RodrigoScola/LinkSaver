@@ -8,6 +8,10 @@ import formatter from '../../utils/formatting/formatting';
 import { BoxCard } from '../../Components/cards/BoxCard';
 import { RenderHead } from '../../Components/RenderHead';
 import { Folder, Post } from 'shared';
+import { AsyncQueue } from '../../class/AsyncQueue';
+import { BoxCardOutline } from '../../Components/cards/BoxCardOutline';
+import { FolderCard } from '../../Components/cards/folderCard';
+import { FolderProvider } from '../../context/FolderContext';
 
 // { folder: baseFolder, posts: basePosts }: { folder: Folder; posts: Post[] }
 
@@ -18,13 +22,25 @@ export default function FOLDERID(p: { folderId: number }) {
 
 	useEffect(() => {
 		async function go() {
-			const folderData = await getData.get(`/folders/${p.folderId}`);
+			const queue = new AsyncQueue();
 
-			setCurrFolder(folderData);
+			console.log(p);
 
-			const posts = await getData.get(`/posts/?parent=${p.folderId}`);
+			queue.Add('folder', getData.get(`/folders/${p.folderId}`));
 
-			for (const post of posts) {
+			queue.Add('parent_folder', getData.get(`/folders/?parent_folder=${p.folderId}`));
+
+			queue.Add('posts', getData.get(`/posts/?parent=${p.folderId}`));
+
+			await queue.Build();
+
+			console.log('queue results', queue.results);
+
+			setCurrFolder(queue.GetResult('folder') as Folder);
+
+			const postsResult = queue.GetResult('posts');
+			const postsArray = Array.isArray(postsResult) ? postsResult : [];
+			for (const post of postsArray) {
 				pcont.AddPost(post);
 			}
 		}
@@ -86,7 +102,7 @@ export default function FOLDERID(p: { folderId: number }) {
 						px={'5'}
 						color={'ActiveBorder'}>
 						<Heading color={'ActiveBorder'} textAlign={'center'}>
-							Recent Files
+							Files
 						</Heading>
 					</BoxCard>
 					<Grid pt={10} gridTemplateColumns={'repeat(4, 1fr)'} rowGap={5} columnGap={7}>
@@ -108,11 +124,3 @@ export default function FOLDERID(p: { folderId: number }) {
 		</Box>
 	);
 }
-
-export const getServerSideProps = async (context: { params: { id: any } }) => {
-	return {
-		props: {
-			folderId: Number(context.params.id),
-		},
-	};
-};

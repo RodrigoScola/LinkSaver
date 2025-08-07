@@ -95,8 +95,9 @@ postCategoryRouter.delete('/:postCategoryId', async (req, res, next) => {
 	}
 
 	try {
-		await privatizeItem(getTable('post_categories').where('id', req.params.postId));
+		await privatizeItem(getTable('post_categories').where('id', req.params.postCategoryId));
 	} catch (err) {
+		console.error(err);
 		return res.json(false);
 	}
 

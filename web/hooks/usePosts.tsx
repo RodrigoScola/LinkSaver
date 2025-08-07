@@ -42,8 +42,6 @@ export const PostsProvider = ({ children }: { children: any }) => {
 	async function UpdatePost(post: Post) {
 		const updated = await getData.update(`/posts/${post.id}`, post);
 
-		console.log({ updated, original: post });
-
 		if (!updated || typeof updated !== 'object' || !('id' in updated)) {
 			console.error(`invalid post`, updated);
 			return;

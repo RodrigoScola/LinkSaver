@@ -1,12 +1,11 @@
 import { createContext, useContext, useState } from 'react';
-import { Category, OmitBy, PostCategories } from 'shared';
+import { OmitBy, PostCategories } from 'shared';
 import { getData } from '../class/serverBridge';
-import assert from 'assert';
 
 type IPostCategory = {
 	GetPostCategories: (postId: number) => Promise<PostCategories[]>;
 	AddPostCategory: (postCat: PostCategories) => void;
-	RemovePostCategory: (postCat: PostCategories) => Promise<void>;
+	RemovePostCategory: (postCat: PostCategories) => Promise<boolean>;
 	CreatePostCategory: (postCat: OmitBy<PostCategories, 'id'>) => Promise<PostCategories | undefined>;
 };
 
@@ -22,8 +21,6 @@ export const PostCategoryProvider = ({ children }: { children: React.ReactNode }
 
 		const cats = await getData.get(`/postCategories/?post_id=${postId}`);
 
-		console.log('post categories for post', postId, cats);
-
 		//shoot me like a dog
 		setPostCategories((curr) => ({
 			...curr,
@@ -33,14 +30,15 @@ export const PostCategoryProvider = ({ children }: { children: React.ReactNode }
 		return cats;
 	}
 
-	async function RemovePostCategory(postCat: PostCategories) {
-		console.log('sending');
+	async function RemovePostCategory(postCat: PostCategories): Promise<boolean> {
 		const removed = await getData.delete(`/postCategories/${postCat.id}`);
 
 		if (!removed) {
 			console.error('Failed to remove post category');
-			return;
+			return false;
 		}
+
+		return Boolean(removed);
 	}
 
 	async function CreatePostCategory(
@@ -57,7 +55,7 @@ export const PostCategoryProvider = ({ children }: { children: React.ReactNode }
 		return newpostCat;
 	}
 
-	function AddPostCategory(postCat: PostCategories) {
+	function AddPostCategory(postCat: PostCategories): void {
 		if (postCat.post_id in postCategories) {
 			const updatedArray = postCategories[postCat.post_id];
 

@@ -1,7 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useObject } from './useObject';
 import { OmitBy, User } from 'shared';
 import { getData } from '../class/serverBridge';
+import { CredentialResponse } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 type Client = {
 	iss: string;
@@ -21,8 +23,11 @@ type Client = {
 
 type UserContextType = {
 	loggedIn: boolean;
+	LogIn: (response: CredentialResponse) => void;
 
 	user: User;
+
+	LogOut: () => void;
 
 	update: (u: Partial<User>) => void;
 };
@@ -45,7 +50,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 	useEffect(() => {
 		(async () => {
-			const user = window.sessionStorage.getItem('user');
+			const user = window.localStorage.getItem('user');
 
 			if (!user) {
 				setIsLoggedIn(false);
@@ -92,6 +97,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		})();
 	}, []);
 
+	function LogOut() {
+		sessionStorage.removeItem('user'); // Or localStorage if you're using that
+	}
+
+	const LogIn = useCallback((response: CredentialResponse) => {
+		if (!response.credential) throw new Error('No credential in response');
+
+		const decoded = jwtDecode(response.credential);
+
+		window.localStorage.setItem('user', JSON.stringify(decoded));
+	}, []);
+
 	const setCurrUser = useCallback((info: Partial<User>) => {
 		userObj.update(info);
 	}, []);
@@ -99,7 +116,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		<UserContext.Provider
 			value={{
 				loggedIn: isLoggedIn ?? false,
+				LogIn,
 				user: userObj.value,
+				LogOut,
 
 				update: setCurrUser,
 			}}>
