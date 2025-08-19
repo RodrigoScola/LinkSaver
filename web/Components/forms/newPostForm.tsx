@@ -88,14 +88,15 @@ export const NewPostForm = ({ ...rest }) => {
 	const notifications = useNotifications();
 
 	useEffect(() => {
+		console.log(`updating user id`, user.user.id);
 		b.Update({ userId: user.user.id });
 	}, [user.user.id]);
 
 	const createPost = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (b.Post().userId !== -1) {
-			console.error(`invalid user`);
+		if (b.Post().userId == -1) {
+			console.error(`invalid user`, user.user.id);
 			return;
 		}
 
@@ -192,7 +193,7 @@ export const NewPostForm = ({ ...rest }) => {
 	return (
 		<Box w={'fit-content'} maxW={'600px'} margin={'auto'} {...rest}>
 			<form onSubmit={createPost}>
-				{shouldShowErrors &&
+				{b.GetErrors(b.Post()).length > 0 &&
 					b.GetErrors(b.Post()).map((error) => (
 						<Text key={error} color='red'>
 							{error}

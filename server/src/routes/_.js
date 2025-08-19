@@ -1,16 +1,18 @@
-import express from 'express'
-import { getLinkPreview } from "link-preview-js"
+import express from 'express';
+import { getLinkPreview } from 'link-preview-js';
 
-const utilRouter = express.Router()
+const utilRouter = express.Router();
 
-utilRouter.get("/getPreview", async (req, res) => {
+utilRouter.get('/getPreview', async (req, res) => {
+	console.log('getting preview', req.query.url);
 	try {
-		const url = new URL(req.query.url)
-		const data = await getLinkPreview(url.href)
-		return res.send(data)
-	} catch (err) {
-		return res.send("invalid url on query parameter")
-	}
-})
+		const url = new URL(req.query.url);
 
-export default utilRouter
+		const data = await getLinkPreview(url.href);
+		return res.json(data);
+	} catch (err) {
+		return;
+	}
+});
+
+export default utilRouter;

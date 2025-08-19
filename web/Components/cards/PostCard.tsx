@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect } from 'react';
 import { usePost } from '../../context/PostContext';
-import { Box, Button, ButtonGroup, Divider, Flex, Heading, Link, Skeleton, Tag } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Divider, Flex, Heading, Link, Skeleton, Tag, Image } from '@chakra-ui/react';
 import { LikeButton } from '../Buttons/LikeButton';
 import { ModalComponent } from '../ui/modals/ModalComponent';
 import { RenderCategories } from '../postTypes/RenderCategories';
@@ -21,6 +21,7 @@ import { useUsers } from '../../hooks/useUser';
 import { SelectedCategories } from './SelectCategory';
 import { AsyncQueue } from '../../class/AsyncQueue';
 import { useNotifications } from '../../hooks/useNotifications';
+import { color } from '../../utils/formatting/ColorFormat';
 
 export const PostCard = () => {
 	const { post, isCreator, save } = usePost();
@@ -193,6 +194,14 @@ export const PostCard = () => {
 		currentFolder.refetch();
 	}, []);
 
+	const stackPost = useQuery({
+		queryKey: ['stackPost', post.post_url],
+		queryFn: () => getData.get(`/_/getPreview/?url=${post.post_url}`),
+		initialData: {
+			images: [],
+		},
+	});
+
 	return (
 		<BoxCard height={'fit-content'} minW={'200px'} w={'30%'} p={3} maxW={'400px'}>
 			<Box pb={2}>
@@ -204,6 +213,13 @@ export const PostCard = () => {
 					</Link>
 				</Flex>
 			</Box>
+			{stackPost.data && stackPost.data.images.length > 0 && (
+				<Image
+					shadow={color.shadows.left}
+					alt={stackPost.data.title}
+					src={stackPost.data.images[0]}
+				/>
+			)}
 			<Box mb={3} py={0}>
 				<RenderCategories categories={Object.values(currentCategories)} />
 			</Box>

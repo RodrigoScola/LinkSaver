@@ -12,7 +12,6 @@ export type NewPostContextType = {
 	SubmitPost: (post: NewPost) => Promise<Post | undefined>;
 	CanSubmit: () => boolean;
 	GetErrors: (newPost: NewPost) => string[];
-	HasErrors: (newPost: NewPost) => boolean;
 	SetCategories: (categories: Category[]) => void;
 	Update(post: Partial<NewPost>): void;
 };
@@ -29,7 +28,8 @@ export const NewPostProvider = ({ children }: { children: React.ReactNode }) => 
 		if (post.value.title == '') {
 			hasError = true;
 		}
-		return !hasError;
+
+		return !hasError && GetErrors(post.value).length === 0;
 	}, [post.value]);
 
 	const Update = useCallback(
@@ -42,32 +42,29 @@ export const NewPostProvider = ({ children }: { children: React.ReactNode }) => 
 	async function SubmitPost(newPost: NewPost): Promise<Post | undefined> {
 		const copy = { ...newPost };
 
-		console.log({ copy });
-
 		delete copy.id;
 
 		const createdpost = await getData.post(`/posts`, copy);
 
-		debugger;
-
-		if (!createdpost.id) {
-			return undefined;
-		}
-		return createdpost;
+		return !createdpost.id ? undefined : createdpost;
 	}
 
-	function HasErrors(): boolean {
-		return GetErrors().length > 0;
-	}
-
-	function GetErrors(): string[] {
+	function GetErrors(newPost: NewPost): string[] {
 		const errors: string[] = [];
 
-		if (post.value.title == '') {
+		if (newPost.title == '') {
 			errors.push('title cannot be empty');
 		}
 		if (Object.values(postCategories).length > 3) {
 			errors.push('you cannot have more than 3 categories');
+		}
+
+		try {
+			if (post.value.post_url.length > 3) {
+				new URL(post.value.post_url);
+			}
+		} catch (err) {
+			errors.push(`Post url needs to be a valid url`);
 		}
 		return errors;
 	}
@@ -85,7 +82,6 @@ export const NewPostProvider = ({ children }: { children: React.ReactNode }) => 
 		<NewPostContext.Provider
 			value={{
 				Post: () => post.value,
-				HasErrors,
 
 				SubmitPost,
 				Update,
