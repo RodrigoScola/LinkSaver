@@ -93,6 +93,8 @@ postCategoryRouter.delete('/:postCategoryId', async (req, res, next) => {
 	}
 
 	try {
+		//TODO: FIGURE THIS OUT
+		//@ts-expect-error this is just to test figure this out
 		await privatizeItem(getTable('post_categories').where('id', req.params.postCategoryId));
 	} catch (err) {
 		console.error(err);

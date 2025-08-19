@@ -4,6 +4,7 @@ import { getTable } from '../../src/class/utils';
 import { InternalError, NotFoundError } from '../../src/ErrorHandling/ErrorHandler';
 import { privatizeItem } from '../../src/Storage';
 import { ContextBuilder } from '../../src/queryFilter/ContextBuilder.js';
+import { Category } from 'shared';
 
 const categoryRouter = express.Router();
 
@@ -77,6 +78,8 @@ categoryRouter.delete('/:id', async (req, res) => {
 	}
 
 	try {
+		//TODO: FIGURE THIS OUT
+		//@ts-expect-error this is just to test figure this out
 		await privatizeItem(getTable('categories').where('id', req.params.id));
 	} catch (err) {
 		res.json(false);

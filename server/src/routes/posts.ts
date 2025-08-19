@@ -120,6 +120,8 @@ postRouter.delete('/:postId', async (req, res) => {
 	}
 
 	try {
+		//TODO: FIGURE THIS OUT
+		//@ts-expect-error this is just to test figure this out
 		await privatizeItem(getTable('posts').where('id', req.params.postId));
 	} catch (err) {
 		console.error(`error deleting post`, err);

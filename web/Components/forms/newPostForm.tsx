@@ -100,7 +100,7 @@ export const NewPostForm = ({ ...rest }) => {
 			return;
 		}
 
-		if (b.HasErrors(b.Post())) {
+		if (b.GetErrors(b.Post()).length > 0) {
 			setShouldShowErrors(true);
 			return;
 		}

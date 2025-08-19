@@ -128,6 +128,8 @@ usersRouter.delete('/:id', async (req, res) => {
 	}
 
 	try {
+		//TODO: FIGURE THIS OUT
+		//@ts-expect-error this is just to test figure this out
 		await privatizeItem(getTable('users').where('id', req.params.id));
 	} catch (err) {
 		res.json(false);

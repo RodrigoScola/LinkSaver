@@ -13,7 +13,7 @@ export const app = express();
 
 import bodyParser from 'body-parser';
 import foldersRouter from './routes/folders.js';
-import stackRouter from './routes/stack.js';
+// import stackRouter from './routes/stack.js';
 import interactionsRouter from './routes/interactions.js';
 import utilRouter from './routes/_.js';
 // import searchRouter from './routes/search.js';
@@ -38,7 +38,7 @@ app.use('/categories', categoryRouter);
 
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
-app.use('/stack', stackRouter);
+// app.use('/stack', stackRouter);
 app.use('/interactions', interactionsRouter);
 
 const EFunction: ErrorRequestHandler = (
@@ -54,17 +54,17 @@ const EFunction: ErrorRequestHandler = (
 
 app.use(EFunction);
 
-if (process.env.NODE_ENV !== 'test') {
-	app.listen(process.env.PORT, async () => {
-		// await generateDummyCategories();
+// if (process.env.NODE_ENV !== 'test') {
+// 	app.listen(process.env.PORT, async () => {
+// 		// await generateDummyCategories();
 
-		// getTable('categories')
-		// 	.insert({ color: '#00AA00', name: 'newCatl', status: 'public', userId: -1 } as Category)
-		// 	.catch(console.error);
+// 		// getTable('categories')
+// 		// 	.insert({ color: '#00AA00', name: 'newCatl', status: 'public', userId: -1 } as Category)
+// 		// 	.catch(console.error);
 
-		console.log('Server is listening in http://localhost:' + process.env.PORT);
-	});
-}
+// 		console.log('Server is listening in http://localhost:' + process.env.PORT);
+// 	});
+// }
 
 async function generateDummyCategories() {
 	const q = new AsyncQueue();
@@ -93,3 +93,5 @@ async function generateDummyCategories() {
 
 	await q.Build();
 }
+
+export default app;

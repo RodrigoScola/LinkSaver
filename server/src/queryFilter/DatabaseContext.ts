@@ -1,7 +1,7 @@
 import { AvailableContextItems, ContextInstance, DatabaseQuery, SEARCH_MODE, TableNames } from './types';
 import { ContextBuilder } from './ContextBuilder';
 import { ItemContextMaker } from './contextItems/ItemContext';
-import { Category, Category, Folder, Interaction, Post, PostCategories, User } from 'shared';
+import { Category, Folder, Interaction, Post, PostCategories, User } from 'shared';
 
 export function GetSearchModeMessage(mode: SEARCH_MODE) {
 	switch (mode) {
