@@ -3,7 +3,7 @@ import { PopoverElement } from '../ui/popover/PopoverElement';
 import { Box, Input, Button, Flex, Text, InputGroup, GridItem, Grid } from '@chakra-ui/react';
 import { FormInput } from '../inputs/FormInput';
 import formatter from '../../utils/formatting/formatting';
-import { FormEvent, useCallback, useEffect } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useCategories } from '../../hooks/useCategories';
 import { SelectFolder } from '../cards/SelectFolder';
 import { useNewPost } from '../../context/newPostContext';
@@ -13,12 +13,21 @@ import { RenderTag } from '../RenderTag';
 import { useQuery } from '@tanstack/react-query';
 import { useFolders } from '../../hooks/useFolder';
 import { useObject } from '../../hooks/useObject';
-import { Category, PostCategories } from 'shared';
+import { Category, Folder } from 'shared';
 import { getData } from '../../class/serverBridge';
 import { useNewPostCategories } from '../../hooks/useNewPostCategories';
+import { useUsers } from '../../hooks/useUser';
+import { useNotifications } from '../../hooks/useNotifications';
+import { usePosts } from '../../hooks/usePosts';
 
 export const NewPostForm = ({ ...rest }) => {
 	const folders = useFolders();
+
+	const postContext = usePosts();
+
+	const user = useUsers();
+
+	const [shouldShowErrors, setShouldShowErrors] = useState(false);
 
 	const postCategories = useObject<Record<number, Category>>({});
 
@@ -38,6 +47,7 @@ export const NewPostForm = ({ ...rest }) => {
 				return;
 			}
 
+			setShouldShowErrors(false);
 			b.Update({ title: data.title });
 		},
 		[b.Update]
@@ -46,8 +56,9 @@ export const NewPostForm = ({ ...rest }) => {
 	const newPostCtx = useNewPost();
 
 	const stackPost = useQuery({
-		queryKey: ['stackPost'],
-		queryFn: () => getData.get(`/_/getPreview/?url=${newPostCtx.Post().post_url}`).then((res) => res.data),
+		queryKey: ['stackPost', newPostCtx.Post().post_url],
+		queryFn: () =>
+			getData.get(`/_/getPreview/?url=${newPostCtx.Post().post_url}`).then((res) => res.data || null),
 	});
 
 	useEffect(() => {
@@ -74,19 +85,55 @@ export const NewPostForm = ({ ...rest }) => {
 
 	const pcat = useNewPostCategories();
 
+	const notifications = useNotifications();
+
+	useEffect(() => {
+		b.Update({ userId: user.user.id });
+	}, [user.user.id]);
+
 	const createPost = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const post = await b.SubmitPost();
+		if (b.Post().userId !== -1) {
+			console.error(`invalid user`);
+			return;
+		}
+
+		if (b.HasErrors(b.Post())) {
+			setShouldShowErrors(true);
+			return;
+		}
+
+		console.log(`current, ${b.Post().userId}`);
+
+		const post = await b.SubmitPost(b.Post());
+
+		if (!post) {
+			notifications.add({
+				title: 'Could not create post',
+				status: 'error',
+			});
+			return;
+		}
+
+		notifications.add({
+			title: 'Post created',
+		});
+
+		postContext.AddPost(post);
 
 		await Promise.all(
 			Object.values(postCategories.value).map((cat) =>
 				pcat.create({
 					category_id: cat.id,
+					status: cat.status,
 					post_id: post.id,
+					userId: cat.userId,
 				})
 			)
 		);
+
+		// window.location.reload();
 	};
 
 	const folderContext = useFolders();
@@ -97,19 +144,20 @@ export const NewPostForm = ({ ...rest }) => {
 		enabled: !!b.Post().parent,
 	});
 
-	const folderFetcher = useQuery({
-		queryKey: ['folders'],
-		queryFn: () =>
-			getData.get('/folders').then((f) => {
-				for (const folder of f.data) folderContext.AddFolder(folder);
-			}),
-	});
+	// const folderFetcher = useQuery({
+	// 	queryKey: ['folders'],
+	// 	queryFn: () =>
+	// 		getData.get('/folders').then((f) => {
+	// 			for (const folder of f.data) folderContext.AddFolder(folder);
+	// 		}),
+	// });
 
 	const categoryCtx = useCategories();
 	const categoryFetcher = useQuery({
-		queryKey: ['categories'],
+		queryKey: ['categories', user],
+		enabled: Boolean(user.user.id),
 		queryFn: () =>
-			getData.get('/categories').then((cats) => {
+			getData.get(`/categories/?userId=${user.user.id}`).then((cats) => {
 				for (const cat of cats.data) categoryCtx.AddCategory(cat);
 			}),
 	});
@@ -131,24 +179,32 @@ export const NewPostForm = ({ ...rest }) => {
 		}
 	}, [categoryCtx.categories]);
 
+	const Update = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		b.Update({ [e.target.name]: e.target.value });
+		setShouldShowErrors(false);
+	}, []);
+
+	const UpdateFolder = useCallback((folder: Folder) => {
+		b.Update({ parent: folder.id });
+		setShouldShowErrors(false);
+	}, []);
+
 	return (
 		<Box w={'fit-content'} maxW={'600px'} margin={'auto'} {...rest}>
 			<form onSubmit={createPost}>
-				{b.GetErrors(b.Post()).map((error) => (
-					<Text key={error} color='red'>
-						{error}
-					</Text>
-				))}
+				{shouldShowErrors &&
+					b.GetErrors(b.Post()).map((error) => (
+						<Text key={error} color='red'>
+							{error}
+						</Text>
+					))}
 				<Grid gap={5} gridTemplateColumns={'repeat(2, 1fr)'}>
 					<GridItem>
 						<FormInput
 							width={'full'}
 							HelperText={'what is the title of the post?'}
 							labelText={'Post Title'}>
-							<Input
-								value={b.Post().title}
-								onChange={(event) => b.Update({ title: event.target.value })}
-							/>
+							<Input name='title' value={b.Post().title} onChange={Update} />
 						</FormInput>
 					</GridItem>
 					<GridItem>
@@ -159,9 +215,10 @@ export const NewPostForm = ({ ...rest }) => {
 							w={'100%'}>
 							<InputGroup>
 								<Input
+									value={b.Post().post_url}
 									type={'url'}
-									name='stack_post_url'
-									onChange={(e) => b.Update({ post_url: e.target.value })}
+									name='post_url'
+									onChange={Update}
 								/>
 							</InputGroup>
 						</FormInput>
@@ -193,10 +250,7 @@ export const NewPostForm = ({ ...rest }) => {
 									Select Folder
 								</Button>
 							}>
-							<SelectFolder
-								onChange={(folder) => b.Update({ parent: folder.id })}
-								baseFolders={folders.GetFolders()}
-							/>
+							<SelectFolder onChange={UpdateFolder} baseFolders={folders.GetFolders()} />
 						</PopoverElement>
 					</GridItem>
 				</SimpleGrid>

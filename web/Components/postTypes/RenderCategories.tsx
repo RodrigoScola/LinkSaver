@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 
 import { Category } from 'shared';
 import { RenderTag } from '../RenderTag';
+import { CategoryTag } from '../List/CategoryList';
 
 type RenderCategoriesProps = {
 	categories: Category[];
@@ -14,12 +15,15 @@ export const RenderCategories = ({ categories, onCategoryClick = () => {}, ...re
 	const renderedTags = useMemo(
 		() =>
 			categories?.map((category: Category, idx: number) => (
-				<RenderTag
+				<CategoryTag
 					onClick={() => onCategoryClick(category)}
 					key={idx}
+					name={category.name}
 					color={category?.color}
-					text={category.name}
 				/>
+
+				// <RenderTag
+				// />
 			)),
 		[categories]
 	);

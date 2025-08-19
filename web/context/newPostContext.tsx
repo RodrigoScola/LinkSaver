@@ -9,9 +9,10 @@ type NewPost = PartialBy<Post, 'id'>;
 
 export type NewPostContextType = {
 	Post: () => NewPost;
-	SubmitPost: () => Promise<Post>;
+	SubmitPost: (post: NewPost) => Promise<Post | undefined>;
 	CanSubmit: () => boolean;
 	GetErrors: (newPost: NewPost) => string[];
+	HasErrors: (newPost: NewPost) => boolean;
 	SetCategories: (categories: Category[]) => void;
 	Update(post: Partial<NewPost>): void;
 };
@@ -31,12 +32,32 @@ export const NewPostProvider = ({ children }: { children: React.ReactNode }) => 
 		return !hasError;
 	}, [post.value]);
 
-	function Update(postData: Partial<NewPost>) {
-		post.update({ ...post.value, ...postData });
+	const Update = useCallback(
+		(postData: Partial<NewPost>) => {
+			post.update(postData);
+		},
+		[post.update]
+	);
+
+	async function SubmitPost(newPost: NewPost): Promise<Post | undefined> {
+		const copy = { ...newPost };
+
+		console.log({ copy });
+
+		delete copy.id;
+
+		const createdpost = await getData.post(`/posts`, copy);
+
+		debugger;
+
+		if (!createdpost.id) {
+			return undefined;
+		}
+		return createdpost;
 	}
 
-	function SubmitPost(): Promise<Post> {
-		return getData.post(`/posts`, post);
+	function HasErrors(): boolean {
+		return GetErrors().length > 0;
 	}
 
 	function GetErrors(): string[] {
@@ -64,6 +85,7 @@ export const NewPostProvider = ({ children }: { children: React.ReactNode }) => 
 		<NewPostContext.Provider
 			value={{
 				Post: () => post.value,
+				HasErrors,
 
 				SubmitPost,
 				Update,

@@ -18,8 +18,6 @@ export type SelectFolderProps = {
 };
 
 export const SelectFolder = ({ baseFolders, onChange = () => {}, defaultSelected }: SelectFolderProps) => {
-	const [selectedFolder, setSelectedFolder] = useState(defaultSelected);
-
 	const fs = useFolders();
 
 	const [folderResult, setFolderResult] = useState<Folder[]>(baseFolders || []);
@@ -45,21 +43,23 @@ export const SelectFolder = ({ baseFolders, onChange = () => {}, defaultSelected
 	return (
 		<Box width={'100%'}>
 			<SearchInput onResult={handleResults} type={'folders'} name={'folderSearchResult'} />
-			{folderResult.map((folder, index) => {
-				return (
-					<Button
-						onClick={() => {
-							onChange(folder);
-							setSelectedFolder(folder);
-						}}
-						key={'folderResult_' + index}>
-						{folder.title}
-					</Button>
-				);
-			})}
+			<Flex flexWrap={'wrap'} gap={2} mt={2}>
+				{folderResult.map((folder, index) => {
+					return (
+						<Button
+							backgroundColor={folder.id === defaultSelected?.id ? folder.color : 'white'}
+							onClick={() => {
+								onChange(folder);
+							}}
+							key={'folderResult_' + index}>
+							{folder.title}
+						</Button>
+					);
+				})}
+			</Flex>
 
 			<PopoverElement
-				onOpen={() => setSelectedFolder(undefined)}
+				onOpen={() => {}}
 				style={{
 					// marginRight: "1em",
 					width: 'fit-content',

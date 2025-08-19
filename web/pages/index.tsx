@@ -92,13 +92,15 @@ export default function Home({
 							</Heading>
 						</BoxCard>
 						<RenderPosts>
-							{Object.values(PostContext.Posts())?.map((post, index) => {
-								return (
-									<PostProvider key={index} post={post}>
-										<PostCard />
-									</PostProvider>
-								);
-							})}
+							{Object.values(PostContext.Posts())
+								.sort((a, b) => b.id - a.id)
+								?.map((post, index) => {
+									return (
+										<PostProvider key={index} post={post}>
+											<PostCard />
+										</PostProvider>
+									);
+								})}
 						</RenderPosts>
 					</Box>
 				)}
@@ -148,7 +150,7 @@ export const getServerSideProps = async () => {
 				.filter((f) => f.status === 'fulfilled')
 				.map((f) => f.value)
 				.flat(),
-			popularPosts: posts,
+			popularPosts: posts.sort((a, b) => b.id - a.id),
 			baseCategories: categories,
 			folders: folders,
 		},

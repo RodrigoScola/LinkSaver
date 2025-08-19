@@ -1,5 +1,5 @@
 import { getData } from '../../class/serverBridge';
-import { Box, Center, Heading, Grid } from '@chakra-ui/react';
+import { Box, Center, Heading, Grid, Flex } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import { PostProvider } from '../../context/PostContext';
 import { PostCard } from '../../Components/cards/PostCard';
@@ -12,6 +12,7 @@ import { AsyncQueue } from '../../class/AsyncQueue';
 import { BoxCardOutline } from '../../Components/cards/BoxCardOutline';
 import { FolderCard } from '../../Components/cards/folderCard';
 import { FolderProvider } from '../../context/FolderContext';
+import { useFolders } from '../../hooks/useFolder';
 
 // { folder: baseFolder, posts: basePosts }: { folder: Folder; posts: Post[] }
 
@@ -19,16 +20,15 @@ export default function FOLDERID(p: { folderId: number }) {
 	const [baseFolder, setCurrFolder] = useState<Folder | null>();
 
 	const pcont = usePosts();
+	const fContext = useFolders();
 
 	useEffect(() => {
 		async function go() {
 			const queue = new AsyncQueue();
 
-			console.log(p);
-
 			queue.Add('folder', getData.get(`/folders/${p.folderId}`));
 
-			queue.Add('parent_folder', getData.get(`/folders/?parent_folder=${p.folderId}`));
+			queue.Add('folders', getData.get(`/folders/?parent_folder=${p.folderId}`));
 
 			queue.Add('posts', getData.get(`/posts/?parent=${p.folderId}`));
 
@@ -37,6 +37,13 @@ export default function FOLDERID(p: { folderId: number }) {
 			console.log('queue results', queue.results);
 
 			setCurrFolder(queue.GetResult('folder') as Folder);
+
+			const foldersResult = queue.GetResult('folders');
+			const foldersArr = Array.isArray(foldersResult) ? foldersResult : [];
+			console.log({ foldersArr });
+			for (const folders of foldersArr) {
+				fContext.AddFolder(folders);
+			}
 
 			const postsResult = queue.GetResult('posts');
 			const postsArray = Array.isArray(postsResult) ? postsResult : [];
@@ -47,15 +54,6 @@ export default function FOLDERID(p: { folderId: number }) {
 
 		go();
 	}, [p.folderId]);
-
-	// const postCtx = usePosts();
-	// const { folder } = useFolder([]);
-	// useEffect(() => {
-	// 	console.log('adding');
-	// 	for (const post of basePosts) {
-	// 		postCtx.AddPost(post);
-	// 	}
-	// }, [baseFolder]);
 
 	return (
 		<Box>
@@ -69,23 +67,24 @@ export default function FOLDERID(p: { folderId: number }) {
 					</BoxCard>
 				</Center>
 			</Box>
-			{/* {folder.length > 0 && (
+
+			{fContext.GetFolders().length > 0 && (
 				<Box pt={3}>
 					<BoxCardOutline>
 						<Heading textAlign={'center'}>Folders</Heading>
 					</BoxCardOutline>
 
-					<Box>
-						{folder?.map((item) => {
+					<Flex py={6} justifyContent={'space-around'}>
+						{fContext.GetFolders()?.map((item) => {
 							return (
-								<FolderProvider key={item.id} folder={item}>
+								<FolderProvider key={item.id} baseFolder={item}>
 									<FolderCard />
 								</FolderProvider>
 							);
 						})}
-					</Box>
+					</Flex>
 				</Box>
-			)} */}
+			)}
 			{Object.values(pcont.Posts()).length > 0 && (
 				<Box p={4}>
 					<BoxCard
@@ -123,4 +122,15 @@ export default function FOLDERID(p: { folderId: number }) {
 			)} */}
 		</Box>
 	);
+}
+
+export async function getServerSideProps(context: any) {
+	console.log(context.params);
+	const { id } = context.params;
+
+	return {
+		props: {
+			folderId: parseInt(id),
+		},
+	};
 }

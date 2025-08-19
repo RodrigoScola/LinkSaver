@@ -42,8 +42,6 @@ postCategoryRouter.get('/', async (req, res) => {
 
 	const rs = req.queue.GetResult('categories') || [];
 
-	console.log('return', rs);
-
 	res.json(rs);
 });
 

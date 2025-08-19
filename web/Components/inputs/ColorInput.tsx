@@ -1,7 +1,7 @@
 import { Box, BoxProps, Input } from '@chakra-ui/react';
 
 import { FormInput } from './FormInput';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 export type ColorProps = {
 	hasInput?: boolean;

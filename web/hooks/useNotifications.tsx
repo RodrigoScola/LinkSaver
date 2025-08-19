@@ -38,22 +38,6 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
 	const notifications = useObject<Record<number, Notification>>();
 
-	useEffect(() => {
-		try {
-			const latest = Object.values(notifications.value)[Object.keys(notifications.value).length - 1];
-
-			if (latest.id) {
-				if (!toast.isActive(latest.id)) {
-					toast({ position: 'top', ...latest });
-				}
-			}
-			setTimeout(() => {
-				toast.close(latest.id);
-				remove(latest.id);
-			}, latest.duration);
-		} catch (err) {}
-	}, [notifications.value]);
-
 	const add = (options: Partial<Notification>) => {
 		const notification = newNotification(options);
 		notifications.update({ [notification.id]: notification });
@@ -61,6 +45,10 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 			position: 'top',
 			...notification,
 		});
+
+		setTimeout(() => {
+			toast.close(notification.id);
+		}, notification.duration);
 	};
 
 	const remove = (id: string) => {

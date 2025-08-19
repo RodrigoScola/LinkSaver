@@ -11,8 +11,6 @@ const axios = axiosBase.create({
 	baseURL: url,
 });
 
-export const USERID = '09962596-9cab-4eaf-bfba-be684cfae532';
-
 class GetData {
 	baseURL = url;
 	ax = axios;
@@ -21,7 +19,12 @@ class GetData {
 		return (await this.ax.delete(url)).data;
 	}
 	async post(url: string, content: object) {
-		return (await this.ax.post(url, content)).data;
+		try {
+			return (await this.ax.post(url, content)).data;
+		} catch (err) {
+			console.error(err);
+			return {};
+		}
 	}
 	async update<T>(url: string, content: object): Promise<T> {
 		return (await this.ax.put(url, content)).data;

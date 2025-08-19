@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useUsers } from '../../hooks/useUser';
 import { SelectedCategories } from './SelectCategory';
 import { AsyncQueue } from '../../class/AsyncQueue';
+import { useNotifications } from '../../hooks/useNotifications';
 
 export const PostCard = () => {
 	const { post, isCreator, save } = usePost();
@@ -31,6 +32,8 @@ export const PostCard = () => {
 	const [currPost, setCurrPost] = useState(post);
 
 	const noop = () => {};
+
+	const notifications = useNotifications();
 
 	const [currentCategories, setCurrentCategories] = useState<Record<number, Category>>({});
 
@@ -78,6 +81,12 @@ export const PostCard = () => {
 				.Build();
 
 			await fetchCategories();
+
+			notifications.add({
+				title: 'Categories updated',
+				description: 'Your post categories have been updated successfully.',
+				status: 'success',
+			});
 		},
 		[catContext]
 	);
@@ -131,11 +140,26 @@ export const PostCard = () => {
 	}, [post.id]);
 
 	const updatePo = async () => {
-		//TODO: server side post
+		try {
+			await save(currPost);
 
-		await save(currPost);
+			notifications.add({
+				title: 'Post updated',
+				description: 'Your post has been updated successfully.',
+				status: 'success',
+				duration: 1000,
+			});
+		} catch (err) {
+			console.error('Error updating post:', err);
 
-		// dispatch(serverSavePost(currPost));
+			notifications.add({
+				title: 'Error updating post',
+				description: 'There was an error updating your post. Please try again.',
+
+				duration: 500,
+				status: 'error',
+			});
+		}
 	};
 
 	const user = useUsers();
@@ -149,14 +173,25 @@ export const PostCard = () => {
 
 	const currentFolder = useQuery({
 		queryKey: ['folder', post.parent],
-		queryFn: () => getData.get(`/folders/${post.parent}`).then((res) => res || {}),
+		queryFn: () => getData.get(`/folders/${post.parent}`).then((r) => r || {}),
 		refetchOnWindowFocus: false,
 		enabled: Boolean(post.parent),
 		initialData: {},
 		placeholderData: {},
 	});
 
-	console.log({ currentFolder: currentFolder.data, parent: post.parent });
+	const updateFolder = useCallback(async (folder: Folder) => {
+		if (!folder) {
+			console.error(`invalid folder`);
+			return;
+		}
+
+		const changeId = post.parent === folder.id ? -1 : folder.id;
+
+		await save({ ...post, parent: changeId });
+
+		currentFolder.refetch();
+	}, []);
 
 	return (
 		<BoxCard height={'fit-content'} minW={'200px'} w={'30%'} p={3} maxW={'400px'}>
@@ -174,9 +209,11 @@ export const PostCard = () => {
 			</Box>
 
 			{currentFolder.data?.title && (
-				<Tag mb={2} color={currentFolder.data.color}>
-					{currentFolder.data.title}
-				</Tag>
+				<>
+					<Tag mb={2} color={currentFolder.data.color}>
+						Folder: {currentFolder.data.title}
+					</Tag>
+				</>
 			)}
 			<Divider borderWidth={'1px'} mt={1} />
 			<Box display={'flex'} justifyContent={'right'}>
@@ -206,24 +243,18 @@ export const PostCard = () => {
 								}
 								headerText={'Edit post'}>
 								<EditPostCard
+									OnSubmit={updatePo}
+									baseFolders={foldersFetcher.data}
 									categories={Object.values(currentCategories)}
 									post={post}
 									onChange={onChange}
-									onCategoryChange={onCategoryChange}
-								/>
-
-								<Heading pb={3} size={'lg'}>
-									Folder
-								</Heading>
-
-								<SelectFolder
-									baseFolders={foldersFetcher.data}
-									onChange={(f) => save({ ...post, parent: f.id })}
-									defaultSelected={
+									onFolderChange={updateFolder}
+									defaultSelectedFolder={
 										foldersFetcher.data?.find(
 											(folder: Folder) => folder.id === post.parent
 										) || null
 									}
+									onCategoryChange={onCategoryChange}
 								/>
 							</ModalComponent>
 							<Skeleton borderRadius={'12px'} isLoaded={Boolean(post.title) || false}>

@@ -10,13 +10,12 @@ type IfolderContext = {
 export const FolderContext = createContext<IfolderContext>({ isCreator: () => false, folder: {} as Folder });
 
 export const FolderProvider = ({ baseFolder, children }: { baseFolder: Folder; children: React.ReactNode }) => {
-	useEffect(() => {}, []);
-
 	return (
 		<FolderContext.Provider
 			value={{
 				//TODO: FIX THIS
-				isCreator: (userId: number) => baseFolder.userId === userId,
+				isCreator: (userId: number) =>
+					Number(baseFolder.userId) === Number(userId) && baseFolder.userId > 0,
 				folder: baseFolder,
 			}}>
 			{children}

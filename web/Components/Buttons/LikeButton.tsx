@@ -1,7 +1,6 @@
 import { Tooltip } from '@chakra-ui/react';
 import { IconButton } from '@chakra-ui/react';
 import { CheckIcon } from '@chakra-ui/icons';
-import { useState } from 'react';
 import { usePost } from '../../context/PostContext';
 import { useInteraction } from '../../hooks/useInteraction';
 import { color } from '../../utils/formatting/ColorFormat';
@@ -15,6 +14,12 @@ export const LikeButton = ({ isDisabled = true, testing = false, ...props }) => 
 	const interactions = useInteraction();
 
 	const nlike = async () => {
+		if (!user.loggedIn) {
+			window.location.href = '/login';
+
+			return;
+		}
+
 		if (post.post.id == -1) {
 			console.error('invalid post id');
 			return;
@@ -49,6 +54,9 @@ export const LikeButton = ({ isDisabled = true, testing = false, ...props }) => 
 					aria-label=''
 					isDisabled={user.loggedIn == false && isDisabled}
 					onClick={nlike}
+					_hover={{
+						backgroundColor: 'yellow.400',
+					}}
 					shadow={color.shadows.left}
 					backgroundColor={'yellow.200'}
 					variant={'outline'}
@@ -72,6 +80,10 @@ export const LikeButton = ({ isDisabled = true, testing = false, ...props }) => 
 				label={user.loggedIn == false && 'You need to be logged in to like this post'}>
 				<IconButton
 					isDisabled={user.loggedIn == false && isDisabled}
+					_hover={{
+						backgroundColor: `yellow.200`,
+						shadow: color.shadows.left,
+					}}
 					onClick={nlike}
 					aria-label=''
 					shadow={color.shadows.right}

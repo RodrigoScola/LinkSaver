@@ -102,6 +102,7 @@ postRouter.post('/', async (req, res) => {
 			post = await getTable('posts').where('id', b[0]).first();
 		}
 	} catch (err) {
+		console.log(`error`, err);
 		throw new InternalError(`could not create post`);
 	}
 
@@ -111,6 +112,8 @@ postRouter.post('/', async (req, res) => {
 postRouter.delete('/:postId', async (req, res) => {
 	await req.queue.Build();
 
+	console.log('building', req.queue);
+
 	const post = req.queue.Get('post');
 	if (post.status === 'rejected' || !post.value) {
 		throw new NotFoundError(`could not get post with that id`);
@@ -119,6 +122,7 @@ postRouter.delete('/:postId', async (req, res) => {
 	try {
 		await privatizeItem(getTable('posts').where('id', req.params.postId));
 	} catch (err) {
+		console.error(`error deleting post`, err);
 		res.json(false);
 	}
 

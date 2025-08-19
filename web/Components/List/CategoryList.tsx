@@ -1,16 +1,16 @@
-import { Box } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 import { BASEURL } from '../../utils/formatting/utils';
 import { RenderTag } from '../RenderTag';
 
 type CategoryListProps = {
-	id?: number | null;
+	id?: number;
 	name?: string;
 	color?: string;
-};
+} & BoxProps;
 
-export const CategoryList = ({ id = null, name = '', color = '' }: CategoryListProps) => {
+export const CategoryTag = ({ id = undefined, name = '', color = '', ...props }: CategoryListProps) => {
 	return (
-		<Box w={'fit-content'}>
+		<Box w={'fit-content'} {...props}>
 			<a href={`${BASEURL}/categories/${id}`}>
 				<RenderTag text={name} color={color} variant={'outline'} />
 			</a>

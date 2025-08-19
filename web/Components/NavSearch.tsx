@@ -3,7 +3,7 @@ import { Flex, useOutsideClick } from '@chakra-ui/react';
 import { PostProvider } from '../context/PostContext';
 import { FolderProvider } from '../context/FolderContext';
 import { AiOutlineTag } from 'react-icons/ai';
-import { FolderList } from './List/FolderList';
+import { FolderTag } from './List/FolderList';
 import { SearchInput } from './inputs/SearchInput';
 import { Box } from '@chakra-ui/react';
 import { useCategories } from '../hooks/useCategories';
@@ -15,7 +15,7 @@ import { PostList } from './List/PostList';
 import { VscFolder } from 'react-icons/vsc';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { CategoryList } from './List/CategoryList';
+import { CategoryTag } from './List/CategoryList';
 import { newFolder, newPost } from '../utils/formatting/utils';
 import { Category, Folder, Post } from 'shared';
 export const NavSearch = () => {
@@ -79,7 +79,7 @@ export const NavSearch = () => {
 									{folderCtx.GetFolders().map((curr, ind) => {
 										return (
 											<FolderProvider key={ind} baseFolder={curr}>
-												<FolderList />
+												<FolderTag />
 											</FolderProvider>
 										);
 									})}
@@ -110,7 +110,7 @@ export const NavSearch = () => {
 									</Flex>
 									<Flex gap={2}>
 										{catContext.categories.map((cat, ind) => {
-											return <CategoryList key={ind} {...cat} />;
+											return <CategoryTag key={ind} {...cat} />;
 										})}
 									</Flex>
 								</Box>

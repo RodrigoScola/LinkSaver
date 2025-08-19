@@ -74,7 +74,7 @@ export type Category = {
 	userId: number;
 
 	color: string;
-	status: string;
+	status: 'public' | 'private';
 };
 
 export type PostCategories = {

@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { FolderContext } from '../../context/FolderContext';
 import { BASEURL } from '../../utils/formatting/utils';
 
-export const FolderList = () => {
+export const FolderTag = () => {
 	const { folder } = useContext(FolderContext);
 
 	return (

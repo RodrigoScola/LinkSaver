@@ -31,6 +31,8 @@ export const FolderProvider = ({ children }: { children: ReactNode }) => {
 	const UpdateFolder = useCallback(async (folder: Folder) => {
 		const updated = await getData.update<Folder>(`/folders/${folder.id}`, folder);
 
+		console.log({ updated, folder });
+
 		if (!('id' in updated)) {
 			return;
 		}
