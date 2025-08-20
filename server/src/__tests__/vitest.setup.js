@@ -1,7 +1,7 @@
 import { app } from '../index';
 import supertest from 'supertest';
 
-import config from '../../knexfile.cjs';
+import config from '../../knexfile.ts/index.js';
 import { knex } from 'knex';
 
 export const dbconnection = knex(config.development);

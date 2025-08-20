@@ -1,6 +1,6 @@
 //TODO: FIGURE THIS OUT
 //@ts-ignore
-import config from '../../knexfile.cjs';
+import config from '../../knexfile.ts/index.js';
 import knex from 'knex';
 import dotenv from 'dotenv';
 import { DatabaseQuery, TableNames } from '../../src/queryFilter/types';
